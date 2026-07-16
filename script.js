@@ -660,6 +660,7 @@ let quizSecondsLeft = 4;
 let quizPendingAction = null; 
 
 // Özel Tasarım Warn Box Tetikleyici
+
 function showQuizWarn(icon, title, text, btnText, callback) {
     const popup = document.getElementById('quiz-warn-popup');
     const iconEl = document.getElementById('quiz-warn-icon');
@@ -673,6 +674,14 @@ function showQuizWarn(icon, title, text, btnText, callback) {
     if (titleEl) titleEl.textContent = title;
     if (textEl) textEl.innerHTML = text;
     if (btnEl) btnEl.textContent = btnText;
+
+    // 🎯 [YENİ SİHİRLİ SATIR]: Butonun tıklama görevini JS içinden güvenle bağlıyoruz.
+    // Böylece HTML'deki çift tetiklenme çakışması sonsuza dek çözülüyor!
+    if (btnEl) {
+        btnEl.onclick = function() {
+            dismissQuizWarn();
+        };
+    }
 
     popup.classList.remove('hidden');
     quizPendingAction = callback;
@@ -721,7 +730,7 @@ function loadQuizQuestion() {
     // SORU 1: İstanbulkart Şifresi (Çizgisel Süre Barı)
     // --------------------------------------------------------
     if (quizCurrentQuestion === 1) {
-        questionText.textContent = "Samet'in İstanbulkart şifresi nedir? 🤔";
+        questionText.textContent = "Samet'in İstanbulkart şifresi nedir? ";
         
         const options = ["140203", "260705", "190500", "050402"];
         options.forEach(opt => {
@@ -731,7 +740,7 @@ function loadQuizQuestion() {
             btn.onclick = () => {
                 if (opt === "260705") {
                     clearInterval(quizTimerInterval);
-                    showQuizWarn("🎉", "Tebrikler!", "Doğru cevapladınız sevgilim! 💖", "Harika, İlerle!", () => {
+                    showQuizWarn("🎉", "Nice!", "Doğru cevapladın sevgilim 💖", "Devam et!", () => {
                         quizCurrentQuestion = 2;
                         loadQuizQuestion();
                     });
@@ -755,7 +764,7 @@ function loadQuizQuestion() {
 
             if (timeLeft <= 0) {
                 clearInterval(quizTimerInterval);
-                showQuizWarn("⏰", "Süre Doldu!", "Zamanı yönetemedin fıstık! Hızlı olmalısın. Tekrar dene!", "Yeniden Dene 🔂", () => {
+                showQuizWarn("⏰", "Süre Doldu!", "Zamanı yönetemedin fıstık! Hızlı olmalısın. Tekrar dene!", "Yeniden Dene", () => {
                     loadQuizQuestion();
                 });
             }
@@ -767,7 +776,7 @@ function loadQuizQuestion() {
     // --------------------------------------------------------
 
     else if (quizCurrentQuestion === 2) {
-        questionText.textContent = "Samet'in Galatasaray'da en sevdiği futbolcu kimdir? 🦁";
+        questionText.textContent = "Samet'in Galatasaray'da en sevdiği futbolcu kimdir? ";
 
         const mainOptions = [
             { name: "Victor Nelsson", correct: false },
@@ -794,7 +803,7 @@ function loadQuizQuestion() {
     // SORU 3: En Sevdiği Yemek (Cacık Çılgınlığı)
     // --------------------------------------------------------
     else if (quizCurrentQuestion === 3) {
-        questionText.textContent = "Samet'in yemeyi en sevdiği şey nedir? 🥣";
+        questionText.textContent = "Samet'in yemeyi en sevdiği şey nedir? ";
 
         const initialOptions = ["Cacık", "Cacık", "Cacık", "Cacık"];
         initialOptions.forEach(() => {
@@ -812,7 +821,7 @@ function loadQuizQuestion() {
     // SORU 4: Kalmadığı Yurt (Görünmez Şıklar - Tam Kazı Kazan Modu)
     // --------------------------------------------------------
     else if (quizCurrentQuestion === 4) {
-        questionText.textContent = "Samet İstanbul'da hangi yurtta kalmamıştır? 🏢";
+        questionText.textContent = "Samet İstanbul'da hangi yurtta kalmamıştır? ";
         
         const yurtOptions = [
             { name: "Cerrah Mehmet Paşa KYK Yurdu", correct: false },
@@ -846,7 +855,7 @@ function loadQuizQuestion() {
                         btn.style.borderColor = "#00ff66";
                         btn.style.background = "rgba(0, 255, 102, 0.05)";
                         setTimeout(() => {
-                            showQuizWarn("🎉", "Harika Gözler!", "Görünmez yurttan kurtuldun sevgilim! Doğru cevap.", "Sıradaki Soruya Geç ▷", () => {
+                            showQuizWarn("🎉", "Nice!", "Doğru cevapladın sevgilim 💖", "Devam et!", () => {
                                 quizCurrentQuestion = 5;
                                 loadQuizQuestion();
                             });
@@ -867,7 +876,7 @@ function loadQuizQuestion() {
     // SORU 5: Gizli Audi (rastgele şıkkın altında, kaydırarak keşfedilir)
     // --------------------------------------------------------
     else if (quizCurrentQuestion === 5) {
-        questionText.textContent = "Samet'in almak istediği hayalindeki araba nedir? 🏎️";
+        questionText.textContent = "Samet'in almak istediği hayalindeki araba nedir? ";
 
         const topCars = ["Fiat Egea", "Toyota Corolla", "Hyundai i20", "Dacia Duster"];
         const underCars = ["Renault Clio", "Honda Civic", "Opel Corsa"]; // yanlış alt şıklar
@@ -885,13 +894,13 @@ function loadQuizQuestion() {
             // ALT KATMAN (saklı şık)
             const bg = document.createElement("div");
             bg.className = "layer-under";
-            bg.textContent = isAudi ? "🏎️ AUDI" : underCars[wrongIdx++];
+            bg.textContent = isAudi ? " AUDI" : underCars[wrongIdx++];
 
             bg.onclick = () => {
                 if (isAudi) {
                     bg.style.borderColor = "#00ff66";
                     bg.style.background = "rgba(0, 255, 102, 0.08)";
-                    showQuizWarn("🏎️", "VROOOM!", "Sahte şıkkın altına saklanan asıl hayalimizi buldun fıstık! Doğru cevap.", "Son Soruya Uç! 🏁", () => {
+                    showQuizWarn("🎉", "Nice!", "Doğru cevapladın sevgilim 💖", "Son soruya geç", () => {
                         quizCurrentQuestion = 6;
                         loadQuizQuestion();
                     });
@@ -917,12 +926,12 @@ function loadQuizQuestion() {
     // SORU 6: İsim Seçme (Farklı Font & Aurora Aura)
     // --------------------------------------------------------
     else if (quizCurrentQuestion === 6) {
-        questionText.textContent = "Lütfen aşağıdaki isimlerden birini seçer misin fıstık? 🥰";
+        questionText.textContent = "Lütfen aşağıdaki isimlerden birini seçer misin fıstık? ";
         
         const names = [
             { name: "Ahmet", correct: false, class: "" },
             { name: "Muhammed", correct: false, class: "" },
-            { name: "Kendal Efe 👑", correct: true, class: "kendal-efe-aurora" }, 
+            { name: "Kendal Efe ", correct: true, class: "kendal-efe-aurora" }, 
             { name: "Emre", correct: false, class: "" }
         ];
 
@@ -930,33 +939,62 @@ function loadQuizQuestion() {
             const btn = document.createElement("button");
             btn.className = `quiz-option-btn ${opt.class}`;
             btn.textContent = opt.name;
-            
-            btn.onclick = () => {
-                if (opt.correct) {
-                    showQuizWarn("🏆", "KUTLAMALAR BAŞLASIN!", 
-                        `<div style="text-align: center;">
-                            <span style="font-size: 40px; display: block; margin-bottom: 15px;">🎉👑</span>
-                            <span style="font-size: 28px; font-weight: 900; color: #ff4d79; display: block; margin-bottom: 10px;">A+</span>
-                            <p style="font-size: 14px; color: #fff; font-weight: 700; margin-bottom: 10px;">Quizi Başarıyla Tamamladınız!</p>
-                            <p style="font-size: 12px; color: #9ca3af;">Önceden tahmin ettiğin o harika hediyeleri artık benden almaya hak kazandın sevgilim!</p>
-                         </div>`, 
-                        "Hediyelerimi Ver Sevgilim! 🎁", () => {
-                            const container = document.querySelector(".games-container");
-                            if (container) {
-                                container.innerHTML = `
-                                    <div style="text-align: center; padding: 40px 20px;">
-                                        <span style="font-size: 60px; display: block; margin-bottom: 20px;">🏆</span>
-                                        <h2 style="font-size: 24px; font-weight: 800; color: #ff4d79; margin-bottom: 10px;">A++ Sürpriz Ustası</h2>
-                                        <p style="color: #9ca3af; font-size: 13px; line-height: 1.6;">Bu oyun alanındaki tüm kilitleri parçaladın fıstık! Şimdi benden o özel paketlerini isteme zamanı...</p>
-                                    </div>
-                                `;
-                            }
-                        }
-                    );
-                } else {
-                    handleWrongAnswer(btn);
+btn.onclick = (e) => {
+        if (e) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+
+        if (opt.correct) {
+            showQuizWarn("🏆", "", 
+                `<div style="text-align: center;">
+                    <span style="font-size: 40px; display: block; margin-bottom: 15px;"></span>
+                    <span style="font-size: 28px; font-weight: 900; color: #ff4d79; display: block; margin-bottom: 10px;">A+</span>
+                    <p style="font-size: 14px; color: #fff; font-weight: 700; margin-bottom: 10px;">Quizi Başarıyla Tamamladın!</p>
+                    <p style="font-size: 12px; color: #9ca3af;"></p>
+                 </div>`, 
+                "Tamam", () => {
+                    // 🚨 Soru indeksini kilitliyoruz
+                    quizCurrentQuestion = 999; 
+
+                    // 1. HTML'deki gerçek ana kutuyu hedef alıyoruz: '.games-container'
+                    // Aynı zamanda içindeki o başlıkların kaybolması için doğrudan aktif alanı da güncelleyebiliriz.
+                    const gamesContainer = document.querySelector(".games-container");
+                    
+                    if (gamesContainer) {
+                        // Tüm oyun alanının içini temizleyip şık başarı mesajımızı ve alttaki puzzle'ı yeniden buraya çiziyoruz:
+                        gamesContainer.innerHTML = `
+                            <div style="text-align: center; padding: 30px 15px; background: rgba(255, 255, 255, 0.05); border-radius: 15px; border: 1px dashed #ff4d79; margin-bottom: 25px;">
+                                <span style="font-size: 40px; display: block; margin-bottom: 10px;">🏆</span>
+                                <h3 style="font-size: 18px; font-weight: 700; color: #ff4d79; margin-bottom: 5px;">Başarıyla Tamamlandı!</h3>
+                                <p style="color: #9ca3af; font-size: 13px; margin-bottom: 15px; line-height: 1.6;">
+                                    Tüm soruları doğru çözdün fıstık! Harikasın.
+                                </p>
+                                <span style="color: #ff4d79; font-weight: 600; font-size: 12px; display: block;"></span>
+                            </div>
+
+                            <!-- Puzzle alanının aşağıda sapasağlam durmasını sağlıyoruz -->
+                            <div class="samet-gift-card" style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 25px; margin-top: 20px;">
+                                <div class="luxury-badge" style="background: rgba(255, 77, 121, 0.1); color: #ff4d79; margin-bottom: 15px;">Puzzle</div>
+                                <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 8px;">Bu da Samet'in Hediyesi</h3>
+                                <p style="font-size: 12px; color: #a1a1aa; line-height: 1.6; margin-bottom: 15px;">Bu puzzle'ı çözüp hediyemi verebilir misin?</p>
+                                
+                                <div id="puzzle-container" class="hidden" style="margin: 20px auto; width: 270px; height: 270px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 2px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255, 77, 121, 0.3); border-radius: 12px; overflow: hidden; position: relative;">
+                                    <!-- Parçalar buraya gelecek -->
+                                </div>
+
+                                <button id="start-puzzle-btn" class="btn" style="width: 100%; background: linear-gradient(135deg, #7b2cbf, #ff4d79); font-size: 12px;" onclick="startSametPuzzle()">Puzzle'ı başlat 🧩</button>
+                            </div>
+                        `;
+                    }
                 }
-            };
+            );
+            
+            return false;
+        } else {
+            handleWrongAnswer(btn);
+        }
+    };
             optionsContainer.appendChild(btn);
         });
     }
@@ -1020,7 +1058,7 @@ function openSaneSubQuiz(saneBtn, optionsContainer) {
                         setTimeout(renderSub, 250);
                     } else {
                         setTimeout(() => {
-                            showQuizWarn("⚽", "Transfer Tamamlandı!", "Sane zincirini kusursuz tamamladın sevgilim! ❤️", "Sıradaki Soruya Uç! ✈️", () => {
+                            showQuizWarn("🎉", "Nice!", "Doğru cevapladın sevgilim 💖", "Devam et!", () => {
                                 quizCurrentQuestion = 3;
                                 loadQuizQuestion();
                             });
@@ -1105,7 +1143,7 @@ function triggerCacikGrid(optionsContainer, clickedBtn) {
                     setTimeout(() => {
                         optionsContainer.classList.remove("cacik-area-mode");
                         optionsContainer.style.height = "";
-                        showQuizWarn("🥣", "Cacıklar Temizlendi!", "Tüm cacıkları afiyetle patlattın sevgilim! Hazırız.", "Bir Sonraki Soru! ▷", () => {
+                        showQuizWarn("🎉", "Nice!", "Doğru cevapladın sevgilim 💖", "Devam et!", () => {
                             quizCurrentQuestion = 4;
                             loadQuizQuestion();
                         });

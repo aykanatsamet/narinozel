@@ -31,10 +31,7 @@
         <!-- YANDAN AÇILAN LÜKS MENÜ PANELİ -->
         <div id="side-menu" class="side-menu-overlay" onclick="toggleMenu()">
             <div class="side-menu-content" onclick="event.stopPropagation()">
-                <div class="menu-header">
-                    <h3>Menü</h3>
-                    <button class="close-menu" onclick="toggleMenu()">✖</button>
-                </div>
+                <!-- DÜZELTME: "Menü" başlığı ve ✖ butonu kaldırıldı; menü hamburgere veya dışarıya dokununca kapanıyor -->
                 <div class="menu-links">
                     <button class="menu-link active" onclick="selectTab('home')">Ana Sayfa</button>
                     <button class="menu-link" onclick="selectTab('gallery')">Galeri</button>
@@ -223,12 +220,12 @@
                         <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 15px; color: #ff4d79; letter-spacing: 0.5px;">✨ Buradan ekleyebilirsin</h3>
                         <div class="search-box-wrapper" style="display: flex; gap: 10px; margin-bottom: 15px;">
                             <input type="text" id="spotify-search-input" placeholder="Bir şarkı veya sanatçı adı..." 
-                                   style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); padding: 12px 18px; border-radius: 14px; color: white; font-size: 13px; outline: none; transition: border-color 0.2s;"
+                                   style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); padding: 12px 18px; border-radius: 14px; color: white; font-size: 16px; outline: none; transition: border-color 0.2s;"
                                    onkeypress="if(event.key === 'Enter') searchSpotifyTracks()">
                             <button class="btn" onclick="searchSpotifyTracks()">Ara</button>
                         </div>
 
-                        <div id="spotify-results" class="spotify-results-list" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div id="spotify-results" class="spotify-results-list">
                           
                         </div>
                     </div>

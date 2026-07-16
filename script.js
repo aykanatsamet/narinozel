@@ -31,20 +31,19 @@ function triggerGlobalIntro() {
 }
 
 
-window.addEventListener('click', function(e) {
-  
+// DÜZELTME: passive:true -> tarayıcı scroll için JS'i beklemek zorunda kalmaz.
+// once:true -> intro bir kez tetiklendikten sonra dinleyiciler otomatik kaldırılır.
+window.addEventListener('click', function () {
     if (!introStarted) {
         triggerGlobalIntro();
     }
-});
+}, { once: true });
 
-window.addEventListener('touchstart', function(e) {
-    
- 
+window.addEventListener('touchstart', function () {
     if (!introStarted) {
         triggerGlobalIntro();
     }
-}, { passive: false });
+}, { passive: true, once: true });
 
 // ==========================================
 // HAMBURGER MENÜ VE NAVİGASYON KONTROLLERİ
@@ -53,6 +52,15 @@ function toggleMenu() {
     const sideMenu = document.getElementById('side-menu');
     if (sideMenu) {
         sideMenu.classList.toggle('open');
+    }
+}
+
+// DÜZELTME: HTML'de onclick="closePopup(...)" ile çağrılıyordu ama fonksiyon hiç tanımlanmamıştı.
+// Popup açıldığında bir daha kapanamıyor ve ekran tam ekran katman altında kilitleniyordu.
+function closePopup(id) {
+    const popup = document.getElementById(id);
+    if (popup) {
+        popup.classList.add('hidden');
     }
 }
 
@@ -81,6 +89,15 @@ function selectTab(tabId) {
         // 📌 [YENİ TETİKLEYİCİ]: Eğer galeri sekmesi açıldıysa, Drive verilerini çek!
         if (tabId === 'gallery') {
             fetchDriveMedia();
+        }
+
+        // DÜZELTME: Spotify iframe'i artık sayfa açılışında değil,
+        // sadece playlist sekmesi ilk kez açıldığında yüklenir (mobil performans)
+        if (tabId === 'spotify') {
+            const spotifyEmbed = document.getElementById('spotify-embed');
+            if (spotifyEmbed && !spotifyEmbed.src && spotifyEmbed.dataset.src) {
+                spotifyEmbed.src = spotifyEmbed.dataset.src;
+            }
         }
 
     } else {

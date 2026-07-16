@@ -167,7 +167,11 @@ body {
     background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    z-index: 200;
+    /* DÜZELTME: 200 -> 1200. Üst bar z-index 999/1000 olduğu için menünün
+       üst kısmındaki linkler barın altında kalıyor ve basılamıyordu.
+       Menü artık her şeyin üstünde; hamburgerin olduğu yere dokunmak da
+       karartmaya dokunmak sayıldığı için menüyü yine kapatır. */
+    z-index: 1200;
     opacity: 0;
     visibility: hidden; /* DÜZELTME: Kapalıyken katman GPU tarafından hiç render edilmez (opacity:0 tek başına blur hesabını durdurmuyordu) */
     pointer-events: none;
@@ -223,7 +227,10 @@ body {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    margin-top: -60px;
+    /* DÜZELTME: Eski -60px, başlık kaldırılınca linkleri yukarı itiyordu.
+       auto marginler linkleri menüde dikey olarak ortalar, footer altta kalır */
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 .menu-link {
@@ -542,12 +549,12 @@ body {
 #current-folder-title {
     font-size: 1.1rem;
     font-weight: 700;
-    /* DÜZELTME: Başlık gerekirse kısalır, buton alanına taşmaz */
+    /* DÜZELTME: Uzun klasör adları artık "..." ile kesilmiyor,
+       gerekirse alt satıra sararak tamamı görünüyor */
     flex: 1 1 auto;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .btn-back {
@@ -1877,9 +1884,10 @@ body {
 @media (max-width: 768px) {
 
     /* Blur efektleri mobil GPU'lar için çok pahalı;
-       yerine daha koyu yarı saydam arka plan kullanıyoruz */
+       yerine daha koyu yarı saydam arka plan kullanıyoruz.
+       (.video-overlay bilinçli olarak listede YOK: Geleceğe Not'taki
+       saydam blur'lu kilit görüntüsü korunuyor — küçük alan, yükü az) */
     .side-menu-overlay,
-    .video-overlay,
     .popup-overlay,
     .delete-media-btn {
         backdrop-filter: none !important;
@@ -1920,4 +1928,11 @@ body {
     .heart-spinner {
         animation: none !important;
     }
+}
+
+/* Playlist arama kutusu: input 16px kalır (mobil zoom'u engeller)
+   ama placeholder küçük yazılır ki tamamı okunabilsin */
+#spotify-search-input::placeholder {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.35);
 }

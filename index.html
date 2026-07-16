@@ -219,10 +219,10 @@
                     <div class="spotify-add-panel" style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.03); padding: 25px; border-radius: 24px;">
                         <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 15px; color: #ff4d79; letter-spacing: 0.5px;">✨ Buradan ekleyebilirsin</h3>
                         <div class="search-box-wrapper" style="display: flex; gap: 10px; margin-bottom: 15px;">
-                            <input type="text" id="spotify-search-input" placeholder="Bir şarkı veya sanatçı adı..." 
+                            <input type="text" id="spotify-search-input" placeholder="Şarkı veya sanatçı ara..." 
                                    style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); padding: 12px 18px; border-radius: 14px; color: white; font-size: 16px; outline: none; transition: border-color 0.2s;"
                                    onkeypress="if(event.key === 'Enter') searchSpotifyTracks()">
-                            <button class="btn" onclick="searchSpotifyTracks()">Ara</button>
+                            <button class="btn" id="spotify-search-btn" onclick="searchSpotifyTracks()">Ara</button>
                         </div>
 
                         <div id="spotify-results" class="spotify-results-list">

@@ -40,9 +40,7 @@ window.addEventListener('click', function(e) {
 
 window.addEventListener('touchstart', function(e) {
     
-    if (e.cancelable) {
-        e.preventDefault();
-    }
+ 
     if (!introStarted) {
         triggerGlobalIntro();
     }

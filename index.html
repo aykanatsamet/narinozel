@@ -207,7 +207,8 @@
                     </div>
 
                     <div class="spotify-player-wrapper" style="margin-bottom: 30px; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255, 77, 121, 0.2); box-shadow: 0 10px 30px rgba(255, 77, 121, 0.05);">
-                        <iframe src="https://open.spotify.com/embed/playlist/54EwejeXw0JHOdl0ILI5lR?utm_source=generator&theme=0" 
+                        <!-- DÜZELTME: src yerine data-src -> iframe sayfa açılışında değil, sadece bu sekme açıldığında yüklenir (script.js/selectTab yüklüyor) -->
+                        <iframe id="spotify-embed" data-src="https://open.spotify.com/embed/playlist/54EwejeXw0JHOdl0ILI5lR?utm_source=generator&theme=0" 
                                 width="100%" 
                                 height="380" 
                                 frameBorder="0" 

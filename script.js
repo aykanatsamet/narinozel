@@ -655,10 +655,18 @@ setTimeout(() => {
         }, 450); // yazmayı bıraktıktan 450ms sonra ara
     });
 
-    // Kutunun dışına tıklanınca kapat
+    // Kutunun dışına tıklanınca kapat ve İÇİNİ BOŞALT
+    // DÜZELTME: Ara butonuna basmak "dışarı tıklama" sayılıyordu ve kutu
+    // arama başlar başlamaz kapanıyordu (Ara butonu çalışmıyor gibi görünüyordu)
     document.addEventListener("click", (e) => {
-        if (!resultsBox.contains(e.target) && e.target !== searchInput) {
+        const searchBtn = document.getElementById("spotify-search-btn");
+        const disariTiklandi = !resultsBox.contains(e.target) &&
+                               e.target !== searchInput &&
+                               e.target !== searchBtn &&
+                               !(searchBtn && searchBtn.contains(e.target));
+        if (disariTiklandi) {
             resultsBox.classList.remove("open");
+            resultsBox.innerHTML = "";
         }
     });
 

@@ -51,7 +51,10 @@ window.addEventListener('touchstart', function () {
 function toggleMenu() {
     const sideMenu = document.getElementById('side-menu');
     if (sideMenu) {
-        sideMenu.classList.toggle('open');
+        const isOpen = sideMenu.classList.toggle('open');
+        // DÜZELTME: Menü açıkken arkadaki sayfanın kaymasını engelle
+        // (hızlı kaydırınca menünün altından sayfanın görünmesini önler)
+        document.body.style.overflow = isOpen ? 'hidden' : '';
     }
 }
 
@@ -528,6 +531,8 @@ async function searchSpotifyTracks() {
     const resultsContainer = document.getElementById("spotify-results");
     if (!query || !resultsContainer) return;
 
+    // DÜZELTME: Kutu artık varsayılan olarak gizli; sadece arama yapıldığında görünür olur
+    resultsContainer.classList.add("open");
 
     resultsContainer.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: center; min-height: 120px; width: 100%;">

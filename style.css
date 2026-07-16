@@ -746,8 +746,40 @@ body {
     height: 260px;
     border-radius: 22px;
     overflow: hidden;
-    background: #050505;
-    border: 1px solid rgba(255, 255, 255, 0.02);
+    /* DÜZELTME: Düz siyah yerine, arkada bir video karesi varmış hissi veren
+       yumuşak renkli ışık lekeleri. Üstteki blur'lu overlay bunları bulanıklaştırınca
+       "gizlenmiş video" görüntüsü oluşuyor */
+    background:
+        radial-gradient(circle at 22% 30%, rgba(255, 77, 121, 0.55) 0%, transparent 42%),
+        radial-gradient(circle at 78% 22%, rgba(130, 90, 255, 0.40) 0%, transparent 48%),
+        radial-gradient(circle at 62% 82%, rgba(255, 170, 90, 0.35) 0%, transparent 45%),
+        radial-gradient(circle at 12% 85%, rgba(90, 170, 255, 0.28) 0%, transparent 40%),
+        #0c0c12;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Işık lekelerine çok yavaş bir süzülme: arkada "oynayan bir şey" varmış hissi */
+.video-locked::before {
+    content: '';
+    position: absolute;
+    inset: -30%;
+    background:
+        radial-gradient(circle at 30% 40%, rgba(255, 77, 121, 0.30) 0%, transparent 35%),
+        radial-gradient(circle at 70% 60%, rgba(130, 90, 255, 0.22) 0%, transparent 40%);
+    animation: videoGhostDrift 14s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes videoGhostDrift {
+    from { transform: translate(-4%, -3%) scale(1); }
+    to   { transform: translate(4%, 3%) scale(1.15); }
+}
+
+/* Kilitliyken içindeki boş (siyah) video elemanı görünmez olsun ki
+   arkadaki renkli katmanı kapatmasın. Kilit açılınca (video-locked
+   sınıfı kalkınca) video normal şekilde görünür. */
+.video-locked video {
+    opacity: 0;
 }
 
 .video-overlay {
@@ -756,9 +788,11 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(10, 10, 10, 0.98) 50%, rgba(255, 77, 121, 0.05) 100%);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    /* DÜZELTME: Neredeyse opak siyah yerine saydam karartma —
+       arkadaki renkli "video" katmanı blur'un içinden hayal meyal görünür */
+    background: rgba(8, 8, 12, 0.35);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
     display: flex;
     flex-direction: column;
     align-items: center;

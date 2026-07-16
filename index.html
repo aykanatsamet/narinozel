@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Narin'e</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💖</text></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- SİNEMATİK GİRİŞ EKRANI -->
+    <div id="intro-screen" class="screen active">
+        <div id="touch-hint">başlatmak için ekrana dokun veya tıkla...</div>
+        <div id="intro-date" class="hidden">26.07.2005</div>
+    </div>
+
+    <!-- ANA UYGULAMA EKRANI -->
+    <div id="main-app" class="hidden">
+        
+        <!-- ÜST BAR & HAMBURGER MENÜ -->
+        <header class="app-header">
+            <div class="logo-area" onclick="triggerSpotifyWrapped()" style="cursor: pointer;">Narin'e</div>
+            <button class="menu-trigger" onclick="toggleMenu()">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </header>
+
+        <!-- YANDAN AÇILAN LÜKS MENÜ PANELİ -->
+        <div id="side-menu" class="side-menu-overlay" onclick="toggleMenu()">
+            <div class="side-menu-content" onclick="event.stopPropagation()">
+                <div class="menu-header">
+                    <h3>Menü</h3>
+                    <button class="close-menu" onclick="toggleMenu()">✖</button>
+                </div>
+                <div class="menu-links">
+                    <button class="menu-link active" onclick="selectTab('home')">Ana Sayfa</button>
+                    <button class="menu-link" onclick="selectTab('gallery')">Galeri</button>
+                    <button class="menu-link" onclick="selectTab('spotify')">Ortak Playlist</button>
+                    <button class="menu-link" onclick="selectTab('games')">Quiz</button>
+                    <button class="menu-link" onclick="selectTab('future')">Geleceğe Not</button>
+                </div>
+                <div class="menu-footer">26.07.2005 ❤️</div>
+            </div>
+        </div>
+
+        <main class="content-wrapper">
+
+            <!-- === 1. SEKME: ANA SAYFA === -->
+            <section id="tab-home" class="tab-content active-content">
+                <div class="home-hero">
+                  
+                    <!-- DOĞUM GÜNÜ KARTI -->
+                    <div class="birthday-card-premium">
+                        <h1 class="main-title-luxury">
+                            Doğum Günün Kutlu Olsun <br>
+                            <span class="highlight-name">Sevgilim ❤️</span>
+                        </h1>
+                        <p class="birthday-subtitle">Bugün tamamen senin için tasarlandı.</p>
+                    </div>
+
+                    <!-- MEKTUP AÇMA BUTONU (KREM & TİTREYEN SÜRÜM) -->
+                    <div id="mektup-wrapper" class="mektup-btn-wrapper">
+                        <button id="open-note-btn" class="envelope-btn active has-notification" onclick="event.stopPropagation(); openNote();">
+                            <span class="note-badge">Sana bir not var</span>
+                            <span class="envelope-icon"></span>
+                        </button>
+                    </div>
+                    
+<!-- ROTANIN BAŞLANGICI VE ROTANIN KENDİSİ -->
+                    <div class="route-container premium-route">
+                        <div class="route-header">
+                            <!-- RETRO PİKSEL KALP -->
+                            <div class="pixel-heart-container">
+                                <div class="pixel-heart"></div>
+                            </div>
+                            <h3>GÜNÜN ROTASI</h3>
+                            <p class="route-subtitle">Senin için hazırladığım günün rotası burada.</p>
+                        </div>
+                        
+                        <div class="vertical-timeline luxury-timeline">
+                            <div class="timeline-line neon-glow-line"></div>
+
+                            <!-- 1. DURAK -->
+                            <div class="timeline-item luxury-card active-step" data-durak="1">
+                                <div class="timeline-dot-wrapper">
+                                    <div class="timeline-dot">01</div>
+                                </div>
+                                <div class="timeline-info">
+                                    <div class="card-meta">
+                                        <span class="time-tag">18.00</span>
+                                        <span class="status-badge status-active">🏘️ Başlangıç</span>
+                                    </div>
+                                    <h4>Günalan Sokak</h4>
+                                    <p>Gün burada başlıyor, ismini duyduğumda beni heyecanlandıran belki de hiç unutamayacağım o sokak burası. </p>
+                                </div>
+                            </div>
+
+                            <!-- 2. DURAK -->
+                            <div class="timeline-item luxury-card" data-durak="2">
+                                <div class="timeline-dot-wrapper">
+                                    <div class="timeline-dot">02</div>
+                                </div>
+                                <div class="timeline-info">
+                                    <div class="card-meta">
+                                        <span class="time-tag">19.00</span>
+                                        <span class="status-badge status-next">🫀 İlk Durak </span>
+                                    </div>
+                                    <h4>Galata Kulesi</h4>
+                                    <p>Ben efsanelere inanarak anlamlandırmayı sevmem ama buranın efsanesine bir şans vermek istiyorum. Galata'ya kiminle çıkarsan ömrünün geri kalanını onunla geçirirmişsin, bu anı paylaşacağım kişi sen ol istiyorum. </p>
+                                </div>
+                            </div>
+
+                            <!-- 3. DURAK -->
+                            <div class="timeline-item luxury-card" data-durak="3">
+                                <div class="timeline-dot-wrapper">
+                                    <div class="timeline-dot">03</div>
+                                </div>
+                                <div class="timeline-info">
+                                    <div class="card-meta">
+                                        <span class="time-tag">20.00</span>
+                                        <span class="status-badge status-locked">🌆 Gün Batımı</span>
+                                    </div>
+                                    <h4>Barnathan</h4>
+                                    <p>Bu güzel geceye ayırttığım bize özel masamıza gidelim, Sen benim gözümde her zaman güzelsin ama bir de gün batımında izlemek istiyorum.</p>
+                                </div>
+                            </div>
+
+                            <!-- 4. DURAK (SON DURAK) -->
+                            <div class="timeline-item luxury-card premium-final" data-durak="4">
+                                <div class="timeline-dot-wrapper">
+                                    <div class="timeline-dot">04</div>
+                                </div>
+                                <div class="timeline-info">
+                                    <div class="card-meta">
+                                        <span class="time-tag">00.00</span>
+                                        <span class="status-badge status-final">🔒 Uzak bir lokasyon</span>
+                                    </div>
+                                    <h4>Yıldızların Altında</h4>
+                                    <p>Hediyelerini burada alacaksın sevgilim. Bu hediyeler, sana olan sevgimin yanında sadece küçük birer somut hatıra. Aslında bu dünyadaki hiçbir şey senin <strong>narinliğine</strong> ve kalbinin güzelliğine layık olamaz sevgilim. Umarım bugün içine sinmiştir, bu güzel günü burada bitiriyoruz. </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 🏆 ROTA TAMAMLANDI KUTUSU (En Son Kartın Hemen Altında Duracak) -->
+                        <div id="rota-tamamlandi-kutusu" class="hidden" style="margin-top: 25px; transition: all 0.5s ease-in-out;">
+                            <div style="text-align: center; padding: 25px 20px; background: rgba(0, 255, 102, 0.04); border: 1px solid rgba(0, 255, 102, 0.25); border-radius: 24px; box-shadow: 0 0 20px rgba(0, 255, 102, 0.15); animation: pulseGlow 1.5s infinite;">
+                                <span style="font-size: 36px; display: block; margin-bottom: 10px;">🏆❤️</span>
+                                <h4 style="color:#00ff66; font-size: 15px; font-weight:800; margin-bottom: 6px; letter-spacing: 0.5px;">Rota tamamlandı sevgilim!</h4>
+                                <p style="font-size: 11px; color:#9ca3af; line-height: 1.6; margin: 0; padding: 0 10px;">Benimle bu yolda yürüdüğün her an için teşekkür ederim. Seni çok seviyorum!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- === 2. SEKME: GALERİ === -->
+            <section id="tab-gallery" class="tab-content">
+                <div class="gallery-hero">
+                    
+                    <div class="gallery-card-premium">
+                       
+                        <span class="luxury-badge">26 Temmuz Arşivi</span>
+                        <h2 class="gallery-title-luxury">📸 Doğum günü galerin</h2>
+                        <p class="gallery-subtitle">Bundan sonraki her doğum gününde buraya birkaç kare bırakmanı istiyorum.</p>
+                    </div>
+
+                    <div class="upload-container-premium" onclick="document.getElementById('file-uploader').click()">
+                        <div class="upload-box-border">
+                            <input type="file" id="file-uploader" accept="image/*,video/*" onchange="handleFileSelect(event)" style="display: none;">
+                            <label for="file-uploader" class="upload-label" onclick="event.stopPropagation()">
+                                <span class="upload-icon">📤</span>
+                                <span class="upload-text">Yeni bir anı eklemek için dokunabilirsin.</span>
+                                <span class="upload-subtext">(Fotoğraf veya Video)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="folder-system-container">
+                        <div class="folder-nav-header">
+                            <span id="current-folder-title">📁 Klasörler</span>
+                            <button id="back-to-root-btn" class="btn-back hidden" onclick="renderRootFolders()">◀ Geri Dön</button>
+                        </div>
+
+
+<div id="gallery-grid-dynamic" class="gallery-grid-premium">
+    <div class="folder-item-loading">
+        <div class="heart-spinner">💓</div>
+    </div>
+</div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- === 3. SEKME: ORTAK PLAYLIST === -->
+            <section id="tab-spotify" class="tab-content">
+                <div class="spotify-container" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); border-radius: 28px; padding: 30px 20px;">
+                    <!-- Başlık Kartı -->
+                    <div class="gallery-card-premium" style="text-align: center; margin-bottom: 25px;">
+                        <span class="luxury-badge"> SPOTİFY PRİVATE LİST</span>
+                        <h2 class="gallery-title-luxury" style="font-size: 1.8rem; font-weight: 800; background: linear-gradient(45deg, #ffffff, #ff4d79); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Ortak Çalma Listesi</h2>
+                        <p class="gallery-subtitle" style="font-size: 12px; color: #6b7280; margin-top: 6px;">Sen ne dinlemeyi seviyorsan bende dinlemek istiyorum. Şarkıyı seçtikten sonra listeye hemen ekleyebilirsin sevgilim.</p>
+                    </div>
+
+                    <div class="spotify-player-wrapper" style="margin-bottom: 30px; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255, 77, 121, 0.2); box-shadow: 0 10px 30px rgba(255, 77, 121, 0.05);">
+                        <iframe src="https://open.spotify.com/embed/playlist/54EwejeXw0JHOdl0ILI5lR?utm_source=generator&theme=0" 
+                                width="100%" 
+                                height="380" 
+                                frameBorder="0" 
+                                allowfullscreen="" 
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                                loading="lazy">
+                        </iframe>
+                    </div>
+
+                    <!-- Canlı Şarkı Arama ve Ekleme Paneli -->
+                    <div class="spotify-add-panel" style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.03); padding: 25px; border-radius: 24px;">
+                        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 15px; color: #ff4d79; letter-spacing: 0.5px;">✨ Buradan ekleyebilirsin</h3>
+                        <div class="search-box-wrapper" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <input type="text" id="spotify-search-input" placeholder="Bir şarkı veya sanatçı adı..." 
+                                   style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); padding: 12px 18px; border-radius: 14px; color: white; font-size: 13px; outline: none; transition: border-color 0.2s;"
+                                   onkeypress="if(event.key === 'Enter') searchSpotifyTracks()">
+                            <button class="btn" onclick="searchSpotifyTracks()">Ara</button>
+                        </div>
+
+                        <div id="spotify-results" class="spotify-results-list" style="display: flex; flex-direction: column; gap: 10px;">
+                          
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- === 4. SEKME: QUIZ === -->
+            <section id="tab-games" class="tab-content">
+                <div class="games-container" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 28px; padding: 30px 20px; position: relative; overflow: hidden; min-height: 450px;">
+                    
+                    <!-- Başlangıç / Uyarı Ekranı -->
+                    <div id="quiz-intro-zone" class="quiz-step-card">
+                        <div class="luxury-badge">KISA BİR QUİZ</div>
+                        <div class="warn-box-premium" style="background: rgba(255, 77, 121, 0.03); border: 1px solid rgba(255, 77, 121, 0.15); border-radius: 20px; padding: 25px; margin: 20px 0; text-align: left;">
+                            <p style="font-size: 14px; font-weight: 700; color: #ff4d79; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <span>🚨</span> Önce bir uyarı
+                            </p>
+                            <p style="font-size: 13px; color: #e4e4e7; line-height: 1.7; margin-bottom: 12px;">
+                                Bu quiz, senin hazırladığım sürprizlerimi sürekli önceden yakalayıp bozmandan kaynaklı özel olarak geliştirildi sevgilim! Bozduğun sürprizlerin hediyelerini bu quizi tamamladığında alabileceksin.
+                            </p>
+                            <p style="font-size: 12px; color: #a1a1aa; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; font-style: italic;">
+                                 <strong> Her soruyu doğru cevaplamak için sonsuz hakkın var. </strong>
+                            </p>
+                        </div>
+                        <button class="btn" style="width: 100%; padding: 14px; font-size: 13px;" onclick="initiateLuxuryQuiz()"> Başla</button>
+            
+                        <div class="samet-gift-card" style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 25px; margin-top: 20px;">
+                            <div class="luxury-badge" style="background: rgba(255, 77, 121, 0.1); color: #ff4d79; margin-bottom: 15px;">Puzzle</div>
+                            <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 8px;">Bu'da Samet'in Hediyesi</h3>
+                            <p style="font-size: 12px; color: #a1a1aa; line-height: 1.6; margin-bottom: 15px;">Bu puzzle'ı çözüp hediyemi verebilir misin?</p>
+                            
+                            <!-- Puzzle Izgarası -->
+                            <div id="puzzle-container" class="hidden" style="margin: 20px auto; width: 270px; height: 270px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 2px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255, 77, 121, 0.3); border-radius: 12px; overflow: hidden; position: relative;">
+                                <!-- Parçalar dinamik gelecek -->
+                            </div>
+
+                            <button id="start-puzzle-btn" class="btn" style="width: 100%; background: linear-gradient(135deg, #7b2cbf, #ff4d79); font-size: 12px;" onclick="startSametPuzzle()">Puzzle'ı başlat 🧩</button>
+                        </div>
+                    </div>
+
+                    <!-- Aktif Soru Alanı -->
+                    <div id="quiz-active-zone" class="hidden" style="animation: fadeIn 0.4s ease-in-out;">
+                        <!-- Soru Başlığı & Süre Çizgisi -->
+                        <div class="quiz-header-meta" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px;">
+                            <span id="quiz-question-counter" class="luxury-badge" style="align-self: flex-start;">SORU 1 / 6</span>
+                            
+                            <!-- Çizgisel Süre Barı -->
+                            <div id="quiz-progress-wrapper" class="hidden" style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; position: relative;">
+                                <div id="quiz-progress-bar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #ff4d79, #ff7b9a); border-radius: 10px; transition: width 0.1s linear; box-shadow: 0 0 10px rgba(255, 77, 121, 0.5);"></div>
+                            </div>
+                        </div>
+
+                        <!-- Soru Metni -->
+                        <h3 id="quiz-question-text" style="font-size: 1.3rem; font-weight: 800; line-height: 1.4; margin-bottom: 25px; color: #fff;">Soru Metni Buraya Gelecek</h3>
+
+                        <!-- Soruya Özel İçerik Alanı -->
+                        <div id="quiz-special-playground" style="position: relative;"></div>
+
+                        <!-- Seçenekler Listesi -->
+                        <div id="quiz-options-container" style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;"></div>
+                    </div>
+
+                    <!-- Özel Lüks Popup Mesaj Kutusu -->
+                    <div id="quiz-warn-popup" class="popup-overlay hidden" style="z-index: 9999;">
+                        <div class="popup-box" style="background: #09090b; border: 1px solid rgba(255, 77, 121, 0.2); border-radius: 24px; padding: 30px 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8);">
+                            <div id="quiz-warn-icon" style="font-size: 40px; margin-bottom: 15px;">🎉</div>
+                            <h4 id="quiz-warn-title" style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 10px;">Aferin</h4>
+                            <p id="quiz-warn-text" style="font-size: 13px; color: #9ca3af; line-height: 1.6; margin-bottom: 20px;">Doğru cevap!</p>
+                            <button id="quiz-warn-btn" class="btn" style="width: 100%;" onclick="dismissQuizWarn()">Devam Et ▷</button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- === 5. SEKME: GELECEĞE NOT === -->
+            <section id="tab-future" class="tab-content">
+                <div class="future-container">
+                    <h2>⏳ Geleceğe Not</h2>
+                    <p>Bir sonraki doğum gününe kadar bu videonun kilidi kapalı kalacak.</p>
+                    
+                    <div id="countdown-timer">
+                        <div class="timer-box"><span id="days">00</span>gün</div>
+                        <div class="timer-box"><span id="hours">00</span>saat</div>
+                        <div class="timer-box"><span id="minutes">00</span>dk</div>
+                        <div class="timer-box"><span id="seconds">00</span>sn</div>
+                    </div>
+
+                    <div id="video-wrapper" class="video-locked">
+                        <div class="video-overlay">
+                            <div class="lock-icon">🔒</div>
+                            <p>Bu video 26.07.2027 tarihinde açılacak.</p>
+                        </div>
+                        <video id="future-video" controls width="100%">
+                            <source id="future-video-source" src="" type="video/mp4">
+                        </video>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- === ORTAK POPUP & MODAL SİSTEMLERİ === -->
+
+        <!-- LÜKS MEKTUP POPUP ALANI -->
+        <div id="note-popup" class="popup-overlay hidden">
+            <div id="note-paper" class="paper-luxury-scroll">
+                
+                <!-- Mektup Başlığı (Sabit) -->
+                <div class="paper-header-premium">
+                    Güzelime Not
+                </div>
+                
+                <!-- Kaydırılabilir Yazı Gövdesi -->
+                <div class="paper-body-scrollable">
+                    <p class="mektup-paragraf highlight">Ömrümün en güzel mucizesi,</p>
+                    
+                    <p class="mektup-paragraf">Bugün sadece senin doğuşunu değil, aslında benim hayatımın gerçek anlamını buluşunu kutluyoruz. İnsan ömrü boyunca o büyük 'iyi ki' dediği anı ararmış; ben o anı senin gözlerinin içine ilk baktığım, gülüşünü ilk gördüğüm gün buldum.</p>
+                    
+                    <p class="mektup-paragraf">Bizi bir araya getiren, yollarimizi kesiştirenlere; o gün bizi tanıştırarak hayatımın en güzel dönüm noktasına vesile olan o güzel insanlara her gün içten içe teşekkür ediyorum. İyi ki bizi tanıştırmışlar, iyi ki seni benim dünyama taşımışlar...</p>
+                    
+                    <p class="mektup-paragraf">Şimdi gözlerimi kapatıp geleceğe baktığımda tek bir dua, tek bir hayal görüyorum: Hayatımın geri kalan her saniyesini, her nefesini seninle geçirmek. Senin yanındayken kendimi hiç olmadığım kadar iyi, hiç hissetmediğim kadar mutlu hissediyorum. Günün hangi saatinde olursak olalım, aklımın bir köşesinde hep sen varsın. Hayatım boyunca aradığım o doğru insanın sen olduğundan, geleceğimi sadece seninle yazmak istediğimden o kadar eminim ki...</p>
+                    
+                    <p class="mektup-paragraf">Sen benim hayatımın en güzel köşesi, en değerli parçası ve en güzel yarınlarımsın. Birlikte kuracağımız o güzel hayatın, aynı çatının altında birbirimize sarılarak geçireceğimiz onlarca doğum gününün habercisi olsun bugün.</p>
+                    
+                    <p class="mektup-paragraf highlight-end">Seni, bu dünyadaki her şeyden ve herkesten çok daha fazla seviyorum. İyi ki doğdun, iyi ki varsın. ❤️</p>
+                </div>
+                
+                <!-- Aksiyon Butonu (Sabit Alt Alan) -->
+                <div class="paper-footer-premium">
+                    <button class="btn btn-luxury-paper" onclick="closeAndFlyNote()">Mektubu Uçur</button>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- TIMELINE GÖREV DETAY POPUP -->
+        <div id="route-popup" class="popup-overlay hidden" onclick="closePopup('route-popup')">
+            <div class="popup-box" onclick="event.stopPropagation()">
+                <h3 id="route-title">durak</h3>
+                <p id="route-desc">görev detayı...</p>
+                <button class="btn" onclick="closePopup('route-popup')">kapat</button>
+            </div>
+        </div>
+
+        <!-- SPOTIFY WRAPPED SİNEMATİK PERDE -->
+        <div id="wrapped-screen" class="popup-overlay hidden">
+            <div id="wrapped-slider"></div>
+            <button class="close-wrapped-btn" onclick="closeWrapped()">✖ Kapat</button>
+        </div>
+
+    </div>
+
+    <!-- 🎨 GALERİ ÖZEL POP-UP SİSTEMLERİ -->
+<!-- 1. Bilgi ve Başarı Pop-up'ı (Tamam butonlu) -->
+<div id="gallery-info-popup" class="popup-overlay hidden" style="z-index: 100000;">
+    <div class="popup-box" style="background: #09090b; border: 1px solid rgba(255, 77, 121, 0.25); border-radius: 24px; padding: 30px 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.85);">
+        <div id="gallery-info-icon" style="font-size: 40px; margin-bottom: 15px;">✨</div>
+        <h4 id="gallery-info-title" style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 10px;">İşlem Başarılı</h4>
+        <p id="gallery-info-text" style="font-size: 13px; color: #9ca3af; line-height: 1.6; margin-bottom: 20px;">Açıklama</p>
+        <button class="btn" style="width: 100%; background: linear-gradient(135deg, #ff4d79, #ff7b9a);" onclick="closeGalleryInfoPopup()">Tamam</button>
+    </div>
+</div>
+
+<!-- 2. Onay İsteme Pop-up'ı (İptal ve Tamam butonlu) -->
+<div id="gallery-confirm-popup" class="popup-overlay hidden" style="z-index: 100000;">
+    <div class="popup-box" style="background: #09090b; border: 1px solid rgba(255, 77, 121, 0.25); border-radius: 24px; padding: 30px 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.85);">
+        <div style="font-size: 40px; margin-bottom: 15px;">🗑️</div>
+        <h4 style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 10px;">Emin misin?</h4>
+        <p style="font-size: 13px; color: #9ca3af; line-height: 1.6; margin-bottom: 25px;">Bu dosyayı tamamen silmek istediğinden emin misin?</p>
+        <div style="display: flex; gap: 12px;">
+            <button class="btn" style="width: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff;" onclick="closeGalleryConfirmPopup(false)">İptal</button>
+            <button class="btn" style="width: 50%; background: linear-gradient(135deg, #ff4d79, #ff7b9a);" onclick="closeGalleryConfirmPopup(true)">Evet, Sil</button>
+        </div>
+    </div>
+</div>
+
+<!-- 3. Dönen Pembe Spinner'lı Yükleniyor Ekranı -->
+<div id="gallery-loading-popup" class="popup-overlay hidden" style="z-index: 100000;">
+    <div class="popup-box" style="background: #09090b; border: 1px solid rgba(255, 77, 121, 0.15); border-radius: 24px; padding: 35px 25px; width: 90%; max-width: 350px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        
+        <!-- Dönen Modern Pembe Halka (Spinner) -->
+        <div class="pink-loading-spinner" style="margin-bottom: 25px;"></div>
+        
+        <p id="gallery-loading-text" style="font-size: 13px; color: #fff; font-weight: 600; margin: 0;">Anı kaydediliyor...</p>
+    </div>
+</div>
+
+<!-- 🎵 SPOTIFY ÖZEL ONAY POP-UP'I -->
+<div id="spotify-confirm-popup" class="popup-overlay hidden" style="z-index: 100000;">
+    <div class="popup-box" style="background: #09090b; border: 1px solid rgba(255, 77, 121, 0.25); border-radius: 24px; padding: 30px 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.85);">
+        <div style="font-size: 40px; margin-bottom: 15px;">🎵</div>
+        <h4 style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 10px;">Şarkı Eklensin mi?</h4>
+        <p id="spotify-confirm-text" style="font-size: 13px; color: #9ca3af; line-height: 1.6; margin-bottom: 25px;">Şarkı detayları...</p>
+        <div style="display: flex; gap: 12px;">
+            <button class="btn" style="width: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff;" onclick="closeSpotifyConfirm(false)">İptal</button>
+            <button class="btn" style="width: 50%; background: linear-gradient(135deg, #ff4d79, #ff7b9a);" onclick="closeSpotifyConfirm(true)">Evet, Ekle</button>
+        </div>
+    </div>
+</div>
+
+    <!-- JavaScript Dosyamızın Bağlantısı -->
+    <script src="script.js"></script>
+</body>
+</html>

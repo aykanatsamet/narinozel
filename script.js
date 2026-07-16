@@ -529,7 +529,14 @@ setTimeout(() => {
 async function searchSpotifyTracks() {
     const query = document.getElementById("spotify-search-input").value.trim();
     const resultsContainer = document.getElementById("spotify-results");
-    if (!query || !resultsContainer) return;
+    if (!resultsContainer) return;
+
+    // DÜZELTME: Boş arama yapılırsa öneri kutusu kapanır ve temizlenir
+    if (!query) {
+        resultsContainer.classList.remove("open");
+        resultsContainer.innerHTML = "";
+        return;
+    }
 
     // DÜZELTME: Kutu artık varsayılan olarak gizli; sadece arama yapıldığında görünür olur
     resultsContainer.classList.add("open");
@@ -667,6 +674,8 @@ setTimeout(() => {
         if (disariTiklandi) {
             resultsBox.classList.remove("open");
             resultsBox.innerHTML = "";
+            // DÜZELTME: Yazılan metin de temizlenir, placeholder geri görünür
+            searchInput.value = "";
         }
     });
 

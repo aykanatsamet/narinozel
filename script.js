@@ -730,8 +730,18 @@ setTimeout(() => {
 
     // Kutunun dışına tıklanınca kapat
     document.addEventListener("click", (e) => {
-        if (!resultsBox.contains(e.target) && e.target !== searchInput) {
+        // 🔧 DÜZELTME: "Ara" butonu (#spotify-search-btn) da "dışarı tıklama"
+        // sayılıyordu, bu yüzden butona basınca sonuçlar açılır açılmaz bu
+        // dinleyici hemen tekrar kapatıyordu (arama çalışmıyormuş gibi
+        // görünüyordu). Artık Ara butonu bu kontrolden hariç tutuluyor.
+        const searchBtn = document.getElementById("spotify-search-btn");
+        const clickedSearchBtn = searchBtn && (e.target === searchBtn || searchBtn.contains(e.target));
+
+        if (!resultsBox.contains(e.target) && e.target !== searchInput && !clickedSearchBtn) {
             resultsBox.classList.remove("open");
+            // 📌 [YENİ]: Boş bir alana tıklanınca kutu placeholder'a dönsün,
+            // yazılan metin temizlensin.
+            searchInput.value = "";
         }
     });
 

@@ -720,14 +720,20 @@ async function prepareGamesTab() {
         gamesProgressState.quizSolved = !!result.quizSolved;
         gamesProgressState.puzzleSolved = !!result.puzzleSolved;
 
+        // Quiz durumu: çözülmüşse "tamamlandı" ekranını göster,
+        // çözülmemişse orijinal quiz giriş ekranını geri getir.
         if (gamesProgressState.quizSolved) {
             renderQuizAlreadyDone();
-            if (gamesProgressState.puzzleSolved) {
-                renderPuzzleAlreadyDone();
-            }
         } else {
-            // Henüz çözülmemiş: orijinal quiz giriş ekranını geri getir
             gamesContainer.innerHTML = originalHTML;
+        }
+
+        // 📌 Puzzle durumu QUIZ'DEN TAMAMEN BAĞIMSIZ kontrol edilir,
+        // çünkü puzzle quiz'e hiç başlamadan da (intro ekranından)
+        // çözülebiliyor. Quiz çözülmemiş olsa bile puzzle daha önce
+        // çözüldüyse burada üzerine yazılır, tekrar çözülmesin.
+        if (gamesProgressState.puzzleSolved) {
+            renderPuzzleAlreadyDone();
         }
     } catch (err) {
         console.error("İlerleme kontrol hatası:", err);

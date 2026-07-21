@@ -706,9 +706,15 @@ setTimeout(() => {
     // Öneri kutusu görünümü için sınıf ekle
     resultsBox.classList.add("suggest-box");
 
-    // Kutunun input'a göre konumlanması için ebeveyni relative yap
-    if (searchInput.parentElement) {
-        searchInput.parentElement.style.position = "relative";
+    // 🔧 DÜZELTME: #spotify-results, .search-box-wrapper'ın kardeşi (child'ı
+    // değil), o yüzden searchInput.parentElement (.search-box-wrapper)
+    // üzerine position:relative vermek resultsBox'ın absolute konumlanmasını
+    // HİÇ etkilemiyordu — kutu sayfanın yanlış/görünmeyen bir yerine
+    // konumlanıyordu (arama çalışıyordu ama sonuçlar hiç görünmüyordu).
+    // Doğrusu: resultsBox'ın KENDİ gerçek parent'ına (.spotify-add-panel)
+    // position:relative vermek.
+    if (resultsBox.parentElement) {
+        resultsBox.parentElement.style.position = "relative";
     }
 
     let searchDebounce;

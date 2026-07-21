@@ -54,11 +54,18 @@ window.addEventListener('click', function(e) {
 });
 
 window.addEventListener('touchstart', function(e) {
-    
-    if (e.cancelable) {
-        e.preventDefault();
-    }
+
+    // 🔧 DÜZELTME: preventDefault() eskiden HER dokunuşta (intro başlasa da
+    // başlamasa da) çağrılıyordu. Bu, mobilde intro başladıktan SONRA da
+    // sayfanın scroll edilmesini ve butonlara dokunulmasını engelliyordu
+    // (sayfa "donmuş" gibi görünüyordu). Artık sadece intro henüz
+    // başlamamışken (yani ilk "başlat" dokunuşunda) preventDefault
+    // çağrılıyor; intro başladıktan sonra dokunuşlar tamamen normal
+    // şekilde işleniyor.
     if (!introStarted) {
+        if (e.cancelable) {
+            e.preventDefault();
+        }
         triggerGlobalIntro();
     }
 }, { passive: false });

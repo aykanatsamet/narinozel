@@ -25,6 +25,19 @@ function triggerGlobalIntro() {
     const introScreen = document.getElementById('intro-screen');
     const mainApp = document.getElementById('main-app');
 
+    // 🔧 SON ÇARE GÜVENLİK AĞI: Normal animasyon zinciri (~3.1sn) her nasılsa
+    // takılır/aksarsa (ör. bir hata fırlarsa), sayfa kalıcı olarak kilitli
+    // kalmasın diye 4.5 saniye sonra intro ekranını KESİN olarak kapatıp
+    // ana uygulamayı gösteriyoruz. Normal akışta bu zaten ~3.1sn'de
+    // gerçekleştiği için burada tekrar aynı işlemi yapmak zararsızdır.
+    const forceUnlockTimeout = setTimeout(() => {
+        if (introScreen) {
+            introScreen.style.pointerEvents = 'none';
+            introScreen.style.display = 'none';
+        }
+        if (mainApp) mainApp.classList.remove('hidden');
+    }, 4500);
+
     if (hint) hint.classList.add('hidden');
 
     setTimeout(() => {
@@ -34,9 +47,18 @@ function triggerGlobalIntro() {
         }
         
         setTimeout(() => {
-            if (introScreen) introScreen.classList.add('tv-off');
+            if (introScreen) {
+                introScreen.classList.add('tv-off');
+                // 🔧 DONMA/FREEZE DÜZELTMESİ: CSS'teki pointer-events:none
+                // kuralına ek olarak, JS'ten de aynı anda garantiye alıyoruz.
+                // Böylece stylesheet her nasılsa geç yüklenmiş/uygulanmamış
+                // olsa bile bu tam ekran katman artık dokunuşları/tıklamaları
+                // asla yutamaz.
+                introScreen.style.pointerEvents = 'none';
+            }
             
             setTimeout(() => {
+                clearTimeout(forceUnlockTimeout);
                 if (introScreen) introScreen.style.display = 'none';
                 if (mainApp) mainApp.classList.remove('hidden');
                 startCountdown(); 

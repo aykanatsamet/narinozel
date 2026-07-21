@@ -600,6 +600,12 @@ async function searchSpotifyTracks() {
     const resultsContainer = document.getElementById("spotify-results");
     if (!query || !resultsContainer) return;
 
+    // 🔧 DÜZELTME: "Ara" butonuna tıklanınca bu fonksiyon direkt çağrılıyordu,
+    // ama sonuç kutusu sadece klavyeyle yazarken (otomatik öneri akışında)
+    // "open" class'ı alıp görünür oluyordu. Butona tıklayınca bu class hiç
+    // eklenmediği için arama gerçekten çalışıyor ama sonuçlar görünmüyordu.
+    // Artık nereden tetiklenirse tetiklensin kutu her zaman açılıyor.
+    resultsContainer.classList.add("open");
 
     resultsContainer.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: center; min-height: 120px; width: 100%;">

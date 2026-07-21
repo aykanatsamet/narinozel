@@ -713,7 +713,7 @@ async function prepareGamesTab() {
     `;
 
     try {
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getProgress`);
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getProgress&_=${Date.now()}`, { cache: "no-store" });
         const result = await response.json();
 
         gamesProgressState.checked = true;
@@ -1096,7 +1096,7 @@ btn.onclick = (e) => {
 
                     // 📌 [YENİ]: Quiz'i sunucu tarafında (tüm cihazlar için)
                     // kalıcı olarak "çözüldü" işaretliyoruz.
-                    fetch(`${GOOGLE_SCRIPT_URL}?action=setQuizSolved`)
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=setQuizSolved&_=${Date.now()}`, { cache: "no-store" })
                         .catch(err => console.error("Quiz kaydetme hatası:", err));
 
                     // 1. HTML'deki gerçek ana kutuyu hedef alıyoruz: '.games-container'
@@ -1439,7 +1439,7 @@ function handlePieceClick(index) {
 
                         // 📌 [YENİ]: Puzzle'ı sunucu tarafında (tüm cihazlar için)
                         // kalıcı olarak "çözüldü" işaretliyoruz.
-                        fetch(`${GOOGLE_SCRIPT_URL}?action=setPuzzleSolved`)
+                        fetch(`${GOOGLE_SCRIPT_URL}?action=setPuzzleSolved&_=${Date.now()}`, { cache: "no-store" })
                             .catch(err => console.error("Puzzle kaydetme hatası:", err));
 
                         const giftCard = document.querySelector('.samet-gift-card');

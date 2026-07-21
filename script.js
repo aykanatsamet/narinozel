@@ -31,19 +31,20 @@ function triggerGlobalIntro() {
 }
 
 
-// DÜZELTME: passive:true -> tarayıcı scroll için JS'i beklemek zorunda kalmaz.
-// once:true -> intro bir kez tetiklendikten sonra dinleyiciler otomatik kaldırılır.
-window.addEventListener('click', function () {
+window.addEventListener('click', function(e) {
     if (!introStarted) {
         triggerGlobalIntro();
     }
-}, { once: true });
+});
 
-window.addEventListener('touchstart', function () {
+window.addEventListener('touchstart', function(e) {
+    if (e.cancelable) {
+        e.preventDefault();
+    }
     if (!introStarted) {
         triggerGlobalIntro();
     }
-}, { passive: true, once: true });
+}, { passive: false });
 
 // ==========================================
 // HAMBURGER MENÜ VE NAVİGASYON KONTROLLERİ
@@ -51,19 +52,7 @@ window.addEventListener('touchstart', function () {
 function toggleMenu() {
     const sideMenu = document.getElementById('side-menu');
     if (sideMenu) {
-        const isOpen = sideMenu.classList.toggle('open');
-        // DÜZELTME: Menü açıkken arkadaki sayfanın kaymasını engelle
-        // (hızlı kaydırınca menünün altından sayfanın görünmesini önler)
-        document.body.style.overflow = isOpen ? 'hidden' : '';
-    }
-}
-
-// DÜZELTME: HTML'de onclick="closePopup(...)" ile çağrılıyordu ama fonksiyon hiç tanımlanmamıştı.
-// Popup açıldığında bir daha kapanamıyor ve ekran tam ekran katman altında kilitleniyordu.
-function closePopup(id) {
-    const popup = document.getElementById(id);
-    if (popup) {
-        popup.classList.add('hidden');
+        sideMenu.classList.toggle('open');
     }
 }
 
@@ -94,13 +83,9 @@ function selectTab(tabId) {
             fetchDriveMedia();
         }
 
-        // DÜZELTME: Spotify iframe'i artık sayfa açılışında değil,
-        // sadece playlist sekmesi ilk kez açıldığında yüklenir (mobil performans)
-        if (tabId === 'spotify') {
-            const spotifyEmbed = document.getElementById('spotify-embed');
-            if (spotifyEmbed && !spotifyEmbed.src && spotifyEmbed.dataset.src) {
-                spotifyEmbed.src = spotifyEmbed.dataset.src;
-            }
+        // 📌 [YENİ TETİKLEYİCİ]: Oyunlar sekmesi açıldığında sunucudan durum kontrolü yap!
+        if (tabId === 'games') {
+            checkGlobalGameStatus();
         }
 
     } else {
@@ -111,7 +96,7 @@ function selectTab(tabId) {
     const allLinks = document.querySelectorAll('.menu-link');
     allLinks.forEach(link => {
         link.classList.remove('active');
-        if (link.getAttribute('onclick').includes(`'${tabId}'`)) {
+        if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(`'${tabId}'`)) {
             link.classList.add('active');
         }
     });
@@ -131,14 +116,12 @@ function openNote() {
     const popup = document.getElementById('note-popup');
     const paper = document.querySelector('.paper-luxury-scroll');
     
-    // Tıklamayı engelleyen her türlü pointer kilidini butonun üzerinden zorla kaldırıyoruz
     const noteBtn = document.getElementById('open-note-btn') || document.querySelector('.envelope-btn');
     if (noteBtn) {
         noteBtn.style.pointerEvents = 'auto';
     }
 
     if (popup) {
-        // Önceki uçuştan kalan sınıfları sıfırla
         if (paper) {
             paper.classList.remove('paper-fly-away');
             paper.style.opacity = "1";
@@ -148,22 +131,19 @@ function openNote() {
     }
 }
 
-// Mektup Uçurarak Kapatma Fonksiyonu (Dinamik Boşluk Korumalı)
+// Mektup Uçurarak Kapatma Fonksiyonu
 function closeAndFlyNote() {
     const paper = document.querySelector('.paper-luxury-scroll');
     const popup = document.getElementById('note-popup');
-    const mektupWrapper = document.getElementById('mektup-wrapper'); // Butonun dış kutusu
+    const mektupWrapper = document.getElementById('mektup-wrapper');
     
     if (paper && popup) {
-        // Gökyüzüne yumuşakça süzülme animasyonunu tetikliyoruz
         paper.classList.add('paper-fly-away');
         
-        // Mektup uçarken butonun sönmesini ve boyutsal olarak küçülmesini başlatıyoruz
         if (mektupWrapper) {
             mektupWrapper.classList.add('fade-out-completely');
         }
         
-        // Animasyonlar tamamlandığında popup'ı kapat ve butonu tamamen ortadan kaldır
         setTimeout(() => {
             popup.classList.add('hidden');
             paper.classList.remove('paper-fly-away');
@@ -172,26 +152,23 @@ function closeAndFlyNote() {
                 mektupWrapper.style.display = 'none';
             }
 
-            // [SİHİRLİ DOKUNUŞ]: Buton tamamen yok edildiğinde, 
-            // üstteki doğum günü kartına zorla alt boşluk veriyoruz ki VIP Adventure asla yukarı yapışmasın!
             const bCard = document.querySelector('.birthday-card-premium');
             if (bCard) {
                 bCard.style.setProperty('margin-bottom', '45px', 'important');
             }
-        }, 550); // 1 saniyelik pürüzsüz geçiş süresi
+        }, 550);
     } else {
         if (popup) popup.classList.add('hidden');
     }
 }
+
 function startCountdown() {
-    // Kilit açılış tarihi: 26 Temmuz 2027 saat 00:00:00
     const targetDate = new Date('July 26, 2027 00:00:00').getTime();
 
     const interval = setInterval(() => {
         const now = new Date().getTime();
         const difference = targetDate - now;
 
-        // Kilitlerin Açılma Anı Geldiğinde (Tarih Dolduğunda)
         if (difference <= 0) {
             clearInterval(interval);
             
@@ -211,7 +188,6 @@ function startCountdown() {
             return;
         }
 
-        // Klasik Sayaç Hesabı
         const d = Math.floor(difference / (1000 * 60 * 60 * 24));
         const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
@@ -227,24 +203,6 @@ function startCountdown() {
         if (mEl) mEl.textContent = m < 10 ? '0' + m : m;
         if (sEl) sEl.textContent = s < 10 ? '0' + s : s;
     }, 1000);
-}
-
-// ==========================================
-// HEDİYE AVLI QUİZ OYUNU
-// ==========================================
-function startQuiz() {
-    let answer = prompt("Bizim ilk kahve içtiğimiz gün senin giydiğin kazak ne renkti? (İpucu: Doğru bilene ilk sürpriz kuponu verilecek!)");
-    if (answer === null) return;
-
-    if (answer.toLowerCase() === "mavi" || answer.toLowerCase() === "lacivert") { 
-        alert("🎉 TEBRİKLER SEVGİLİM! Doğru bildin. Ödülün: 'Yıl Boyunca Geçerli Sınırsız Masaj Kuponu'. Ekran görüntüsü al ve bana göster! Bölüm 1 tamamlandı, oyun alanı başarıyla kapandı.");
-        const gCard = document.getElementById('card-game-1');
-        const tGames = document.getElementById('tab-games');
-        if (gCard) gCard.style.display = 'none'; 
-        if (tGames) tGames.innerHTML = "<h2>🎮 Ödül Kazanıldı!</h2><p style='color:#00ff66; margin-top:10px;'>Tüm oyunları temizledin ve hediyelerini aldın sevgilim. Harikasın!</p>";
-    } else {
-        alert("❌ Yanlış cevap sevgilim, ama hafızanı tazeleyip tekrar deneyebilirsin! Kazanana kadar buradayız ❤️");
-    }
 }
 
 // ==========================================
@@ -301,13 +259,12 @@ function closeWrapped() {
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwRpNuYBXjFwnntoi-t1MKjEL-zvnsV_PVqQ6u5auTpeYhb9wy-Fy2jhjAddCsYBMYIA/exec";
 
 let driveData = { folders: [], rootFiles: [] }; 
-let currentActiveFolderId = "1WtSMevhKFUFhcvEgnkV_BgLvUgOyB5l5"; // Ana Klasör ID'si
+let currentActiveFolderId = "1WtSMevhKFUFhcvEgnkV_BgLvUgOyB5l5";
 
 async function fetchDriveMedia() {
     const grid = document.getElementById("gallery-grid-dynamic");
     if (!grid) return;
 
-    // Yazı kaldırıldı, sadece dönen tatlı kalp emojisi kaldı sevgilim:
     grid.innerHTML = `
         <div class="folder-item-loading">
             <div class="heart-spinner">💓</div>
@@ -426,30 +383,21 @@ function renderFileItem(parentGrid, file, folderContextId) {
     `;
     parentGrid.appendChild(item);
 }
-// GÜNCELLENMİŞ SİLME FONKSİYONU
+
 function deleteDriveMedia(event, fileId, folderContextId) {
     event.stopPropagation();
     
-    // Şık onay pop-up'ını tetikliyoruz
     showGalleryConfirm(() => {
-        // "Evet, Sil" butonuna basılırsa burası çalışır:
         showGalleryLoading("Dosya siliniyor...");
 
         fetch(GOOGLE_SCRIPT_URL, {
             method: "POST",
             mode: "no-cors",
-            headers: {
-                "Content-Type": "text/plain"
-            },
-            body: JSON.stringify({
-                action: "delete",
-                fileId: fileId
-            })
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({ action: "delete", fileId: fileId })
         })
         .then(() => {
             hideGalleryLoading();
-            
-            // Başarı pop-up'ı
             showGalleryInfo("🧹", "İşlem tamamlandı.", "Dosya silindi.");
             
             if (folderContextId === "root") {
@@ -471,12 +419,10 @@ function deleteDriveMedia(event, fileId, folderContextId) {
     });
 }
 
-// GÜNCELLENMİŞ DOSYA YÜKLEME FONKSİYONU
 function handleFileSelect(event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Şık pembe progress bar'lı yükleniyor popup'ını açıyoruz
     showGalleryLoading("Dosya kaydediliyor...");
 
     const reader = new FileReader();
@@ -486,9 +432,7 @@ function handleFileSelect(event) {
         fetch(GOOGLE_SCRIPT_URL, {
             method: "POST",
             mode: "no-cors", 
-            headers: {
-                "Content-Type": "text/plain"
-            },
+            headers: { "Content-Type": "text/plain" },
             body: JSON.stringify({
                 filename: file.name,
                 mimeType: file.type,
@@ -498,13 +442,8 @@ function handleFileSelect(event) {
         })
         .then(() => {
             hideGalleryLoading();
-            
-            // Başarı pop-up'ı yeni mesajla açılıyor
             showGalleryInfo("🎉", "Başarıyla tamamlandı.", "Dosya bu senenin klasörüne kaydedildi.");
-            
-            setTimeout(() => {
-                fetchDriveMedia(); 
-            }, 3000);
+            setTimeout(() => { fetchDriveMedia(); }, 3000);
         })
         .catch(err => {
             hideGalleryLoading();
@@ -519,7 +458,6 @@ function renderRootFolders() {
     renderDriveFolders();
 }
 
-// wrapped tetikleme ve ilk event dinleyicileri ayarı (fetches Drive only when gallery tab selected)
 setTimeout(() => {
     const titleEl = document.querySelector('.main-title-luxury');
     if (titleEl) titleEl.addEventListener('click', triggerSpotifyWrapped);
@@ -529,17 +467,7 @@ setTimeout(() => {
 async function searchSpotifyTracks() {
     const query = document.getElementById("spotify-search-input").value.trim();
     const resultsContainer = document.getElementById("spotify-results");
-    if (!resultsContainer) return;
-
-    // DÜZELTME: Boş arama yapılırsa öneri kutusu kapanır ve temizlenir
-    if (!query) {
-        resultsContainer.classList.remove("open");
-        resultsContainer.innerHTML = "";
-        return;
-    }
-
-    // DÜZELTME: Kutu artık varsayılan olarak gizli; sadece arama yapıldığında görünür olur
-    resultsContainer.classList.add("open");
+    if (!query || !resultsContainer) return;
 
     resultsContainer.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: center; min-height: 120px; width: 100%;">
@@ -591,9 +519,7 @@ async function searchSpotifyTracks() {
 }
 
 async function addTrackToOurPlaylist(trackUri, trackName) {
-    // Kendine özel Spotify pop-up'ımızı çağırıyoruz:
     showSpotifyConfirm(trackName, () => {
-        // "Evet, Ekle" denirse burası çalışır:
         showGalleryLoading("Şarkı çalma listesine ekleniyor...");
 
         const requestUrl = `${GOOGLE_SCRIPT_URL}?action=addSpotifyTrack&trackUri=${encodeURIComponent(trackUri)}`;
@@ -604,7 +530,7 @@ async function addTrackToOurPlaylist(trackUri, trackName) {
                 hideGalleryLoading();
                 
                 if (result.success) {
-                    showGalleryInfo("🎵", "Başarıyla tamamlandı.", `"${trackName}" şarkısı ortak çalma listesine eklendi, listeyi yenileyince göreceksin.`);
+                    showGalleryInfo("🎵", "Başarıyla tamamlandı.", `"${trackName}" şarkısı ortak çalma listesine eklendi.`);
                     
                     document.getElementById("spotify-search-input").value = "";
                     const resultsBox = document.getElementById("spotify-results");
@@ -637,10 +563,8 @@ setTimeout(() => {
     const resultsBox = document.getElementById("spotify-results");
     if (!searchInput || !resultsBox) return;
 
-    // Öneri kutusu görünümü için sınıf ekle
     resultsBox.classList.add("suggest-box");
 
-    // Kutunun input'a göre konumlanması için ebeveyni relative yap
     if (searchInput.parentElement) {
         searchInput.parentElement.style.position = "relative";
     }
@@ -659,27 +583,15 @@ setTimeout(() => {
         searchDebounce = setTimeout(async () => {
             resultsBox.classList.add("open");
             await searchSpotifyTracks();
-        }, 450); // yazmayı bıraktıktan 450ms sonra ara
+        }, 450);
     });
 
-    // Kutunun dışına tıklanınca kapat ve İÇİNİ BOŞALT
-    // DÜZELTME: Ara butonuna basmak "dışarı tıklama" sayılıyordu ve kutu
-    // arama başlar başlamaz kapanıyordu (Ara butonu çalışmıyor gibi görünüyordu)
     document.addEventListener("click", (e) => {
-        const searchBtn = document.getElementById("spotify-search-btn");
-        const disariTiklandi = !resultsBox.contains(e.target) &&
-                               e.target !== searchInput &&
-                               e.target !== searchBtn &&
-                               !(searchBtn && searchBtn.contains(e.target));
-        if (disariTiklandi) {
+        if (!resultsBox.contains(e.target) && e.target !== searchInput) {
             resultsBox.classList.remove("open");
-            resultsBox.innerHTML = "";
-            // DÜZELTME: Yazılan metin de temizlenir, placeholder geri görünür
-            searchInput.value = "";
         }
     });
 
-    // Input'a tekrar odaklanınca (sonuç varsa) kutuyu geri aç
     searchInput.addEventListener("focus", () => {
         if (resultsBox.innerHTML.trim() !== "") {
             resultsBox.classList.add("open");
@@ -688,15 +600,70 @@ setTimeout(() => {
 }, 1000);
 
 // =========================================================================
-// 🎯 PREMIUM & INTERACTIVE LUXURY QUIZ KONTROL SİSTEMİ (V3 SÜPER GÜNCELLEME)
+// 🎯 GLOBAL KİLİT VE TEK ÇÖZÜM KONTROL SİSTEMİ (SUNUCU DESTEKLİ)
+// =========================================================================
+async function checkGlobalGameStatus() {
+    try {
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getGameStatus`);
+        const data = await response.json();
+
+        if (data.quizCompleted) {
+            renderQuizCompletedState();
+        }
+
+        if (data.puzzleCompleted) {
+            renderPuzzleCompletedState();
+        }
+    } catch (err) {
+        console.error("Oyun durumu kontrol edilemedi:", err);
+    }
+}
+
+// Quiz Zaten Çözüldüyse Gösterilecek Kilitli Ekran
+function renderQuizCompletedState() {
+    const introZone = document.getElementById('quiz-intro-zone');
+    const activeZone = document.getElementById('quiz-active-zone');
+    
+    if (introZone) {
+        introZone.innerHTML = `
+            <div style="text-align: center; padding: 25px 15px; background: rgba(0, 255, 102, 0.05); border-radius: 15px; border: 1px dashed #00ff66;">
+                <span style="font-size: 38px; display: block; margin-bottom: 10px;">🏆</span>
+                <h3 style="font-size: 16px; font-weight: 800; color: #00ff66; margin-bottom: 5px;">Quiz Zaten Başarıyla Tamamlandı!</h3>
+                <p style="color: #a1a1aa; font-size: 12px; line-height: 1.5;">
+                    Tüm soruları daha önce harika bir skorla doğru yanıtladın sevgilim.
+                </p>
+            </div>
+        `;
+        introZone.classList.remove('hidden');
+    }
+    if (activeZone) activeZone.classList.add('hidden');
+}
+
+// Puzzle Zaten Çözüldüyse Gösterilecek Kilitli Ekran
+function renderPuzzleCompletedState() {
+    const giftCard = document.querySelector('.samet-gift-card');
+    if (giftCard) {
+        giftCard.innerHTML = `
+            <div style="text-align: center; padding: 20px 15px; background: rgba(255, 77, 121, 0.05); border-radius: 15px; border: 1px solid rgba(255, 77, 121, 0.2);">
+                <span style="font-size: 35px; display: block; margin-bottom: 8px;">🎁</span>
+                <h4 style="color:#00ff66; font-size: 14px; font-weight:800;">Puzzle Zaten Çözüldü!</h4>
+                <p style="font-size: 12px; color:#fff; font-weight:700; margin-top:8px; line-height:1.5;">
+                    Samet'in Hediyesi: 5 veya 10 adet gıdından öpmek :)
+                </p>
+                <p style="font-size: 11px; color:#a1a1aa; margin-top:5px;">Seni çok seviyorum!</p>
+            </div>
+        `;
+    }
+}
+
+// =========================================================================
+// 🎯 PREMIUM & INTERACTIVE LUXURY QUIZ KONTROL SİSTEMİ
 // =========================================================================
 
 let quizCurrentQuestion = 1;
 let quizTimerInterval = null;
 let quizSecondsLeft = 4;
 let quizPendingAction = null; 
-
-// Özel Tasarım Warn Box Tetikleyici
 
 function showQuizWarn(icon, title, text, btnText, callback) {
     const popup = document.getElementById('quiz-warn-popup');
@@ -712,8 +679,6 @@ function showQuizWarn(icon, title, text, btnText, callback) {
     if (textEl) textEl.innerHTML = text;
     if (btnEl) btnEl.textContent = btnText;
 
-    // 🎯 [YENİ SİHİRLİ SATIR]: Butonun tıklama görevini JS içinden güvenle bağlıyoruz.
-    // Böylece HTML'deki çift tetiklenme çakışması sonsuza dek çözülüyor!
     if (btnEl) {
         btnEl.onclick = function() {
             dismissQuizWarn();
@@ -763,9 +728,7 @@ function loadQuizQuestion() {
     }
     if (optionsContainer) optionsContainer.innerHTML = "";
 
-    // --------------------------------------------------------
-    // SORU 1: İstanbulkart Şifresi (Çizgisel Süre Barı)
-    // --------------------------------------------------------
+    // SORU 1: İstanbulkart Şifresi
     if (quizCurrentQuestion === 1) {
         questionText.textContent = "Samet'in İstanbulkart şifresi nedir? ";
         
@@ -808,10 +771,7 @@ function loadQuizQuestion() {
         }, 50);
     }
 
-    // --------------------------------------------------------
-    // SORU 2: Galatasaray En Sevdiği Futbolcu (Kompakt ve Sabit Ekran)
-    // --------------------------------------------------------
-
+    // SORU 2: Galatasaray En Sevdiği Futbolcu
     else if (quizCurrentQuestion === 2) {
         questionText.textContent = "Samet'in Galatasaray'da en sevdiği futbolcu kimdir? ";
 
@@ -836,9 +796,8 @@ function loadQuizQuestion() {
             optionsContainer.appendChild(btn);
         });
     }
-// --------------------------------------------------------
-    // SORU 3: En Sevdiği Yemek (Cacık Çılgınlığı)
-    // --------------------------------------------------------
+
+    // SORU 3: En Sevdiği Yemek
     else if (quizCurrentQuestion === 3) {
         questionText.textContent = "Samet'in yemeyi en sevdiği şey nedir? ";
 
@@ -848,15 +807,13 @@ function loadQuizQuestion() {
             btn.className = "quiz-option-btn";
             btn.textContent = "Cacık";
             btn.onclick = () => {
-                triggerCacikGrid(optionsContainer, btn); // ← tıklanan butonu geçir
+                triggerCacikGrid(optionsContainer, btn);
             };
             optionsContainer.appendChild(btn);
         });
     }
 
-// --------------------------------------------------------
-    // SORU 4: Kalmadığı Yurt (Görünmez Şıklar - Tam Kazı Kazan Modu)
-    // --------------------------------------------------------
+    // SORU 4: Kalmadığı Yurt
     else if (quizCurrentQuestion === 4) {
         questionText.textContent = "Samet İstanbul'da hangi yurtta kalmamıştır? ";
         
@@ -874,21 +831,17 @@ function loadQuizQuestion() {
             btn.style.textShadow = "none";
             btn.textContent = opt.name;
             
-            // Şıkkın o an görünür olup olmadığını takip eden özel bir durum tanımlıyoruz
             let isRevealed = false;
             
             btn.onclick = () => {
-                // EĞER ŞIK HENÜZ GÖRÜNMEZ İSE (İlk Tıklama - Sadece Yazıyı Göster):
                 if (!isRevealed) {
-                    btn.style.color = "#fff"; // Yazıyı görünür yap
-                    isRevealed = true; // Durumu görünür olarak güncelle
-                    return; // İlk tıklamada doğru veya yanlış fark etmeksizin işlemi burada bitir!
+                    btn.style.color = "#fff";
+                    isRevealed = true;
+                    return;
                 }
                 
-                // EĞER ŞIK ZATEN GÖRÜNÜR İSE VE TEKRAR TIKLANDIYSA (İkinci Tıklama - Karar Verme):
                 if (isRevealed) {
                     if (opt.correct) {
-                        // Görünür olan doğru şıkka tekrar basılırsa tebrik popup'ını aç
                         btn.style.borderColor = "#00ff66";
                         btn.style.background = "rgba(0, 255, 102, 0.05)";
                         setTimeout(() => {
@@ -898,7 +851,6 @@ function loadQuizQuestion() {
                             });
                         }, 500);
                     } else {
-                        // Görünür olan yanlış şıkka tekrar basılırsa kırmızı titreme animasyonunu tetikle
                         btn.classList.add("quiz-option-wrong");
                         setTimeout(() => {
                             btn.classList.remove("quiz-option-wrong");
@@ -909,16 +861,14 @@ function loadQuizQuestion() {
             optionsContainer.appendChild(btn);
         });
     }
-// --------------------------------------------------------
-    // SORU 5: Gizli Audi (rastgele şıkkın altında, kaydırarak keşfedilir)
-    // --------------------------------------------------------
+
+    // SORU 5: Gizli Audi
     else if (quizCurrentQuestion === 5) {
         questionText.textContent = "Samet'in almak istediği hayalindeki araba nedir? ";
 
         const topCars = ["Fiat Egea", "Toyota Corolla", "Hyundai i20", "Dacia Duster"];
-        const underCars = ["Renault Clio", "Honda Civic", "Opel Corsa"]; // yanlış alt şıklar
+        const underCars = ["Renault Clio", "Honda Civic", "Opel Corsa"];
 
-        // Audi her seferinde rastgele bir şıkkın altında saklanır
         const audiIndex = Math.floor(Math.random() * topCars.length);
         let wrongIdx = 0;
 
@@ -928,7 +878,6 @@ function loadQuizQuestion() {
 
             const isAudi = (i === audiIndex);
 
-            // ALT KATMAN (saklı şık)
             const bg = document.createElement("div");
             bg.className = "layer-under";
             bg.textContent = isAudi ? " AUDI" : underCars[wrongIdx++];
@@ -942,11 +891,10 @@ function loadQuizQuestion() {
                         loadQuizQuestion();
                     });
                 } else {
-                    handleWrongAnswer(bg); // sadece titrer, hiçbir şey kendiliğinden hareket etmez
+                    handleWrongAnswer(bg);
                 }
             };
 
-            // ÜST KATMAN (normal görünen, kaydırılabilir şık)
             const handle = document.createElement("div");
             handle.className = "layer-upper";
             handle.textContent = carName;
@@ -959,9 +907,7 @@ function loadQuizQuestion() {
         });
     }
 
-    // --------------------------------------------------------
-    // SORU 6: İsim Seçme (Farklı Font & Aurora Aura)
-    // --------------------------------------------------------
+    // SORU 6: İsim Seçme (GÜNCELLEME: ÇÖZÜLDÜĞÜNÜ SUNUCUYA KİLİTLER)
     else if (quizCurrentQuestion === 6) {
         questionText.textContent = "Lütfen aşağıdaki isimlerden birini seçer misin fıstık? ";
         
@@ -976,68 +922,36 @@ function loadQuizQuestion() {
             const btn = document.createElement("button");
             btn.className = `quiz-option-btn ${opt.class}`;
             btn.textContent = opt.name;
-btn.onclick = (e) => {
-        if (e) {
-            e.stopPropagation();
-            e.preventDefault();
-        }
-
-        if (opt.correct) {
-            showQuizWarn("🏆", "", 
-                `<div style="text-align: center;">
-                    <span style="font-size: 40px; display: block; margin-bottom: 15px;"></span>
-                    <span style="font-size: 28px; font-weight: 900; color: #ff4d79; display: block; margin-bottom: 10px;">A+</span>
-                    <p style="font-size: 14px; color: #fff; font-weight: 700; margin-bottom: 10px;">Quizi Başarıyla Tamamladın!</p>
-                    <p style="font-size: 12px; color: #9ca3af;"></p>
-                 </div>`, 
-                "Tamam", () => {
-                    // 🚨 Soru indeksini kilitliyoruz
-                    quizCurrentQuestion = 999; 
-
-                    // 1. HTML'deki gerçek ana kutuyu hedef alıyoruz: '.games-container'
-                    // Aynı zamanda içindeki o başlıkların kaybolması için doğrudan aktif alanı da güncelleyebiliriz.
-                    const gamesContainer = document.querySelector(".games-container");
-                    
-                    if (gamesContainer) {
-                        // Tüm oyun alanının içini temizleyip şık başarı mesajımızı ve alttaki puzzle'ı yeniden buraya çiziyoruz:
-                        gamesContainer.innerHTML = `
-                            <div style="text-align: center; padding: 30px 15px; background: rgba(255, 255, 255, 0.05); border-radius: 15px; border: 1px dashed #ff4d79; margin-bottom: 25px;">
-                                <span style="font-size: 40px; display: block; margin-bottom: 10px;">🏆</span>
-                                <h3 style="font-size: 18px; font-weight: 700; color: #ff4d79; margin-bottom: 5px;">Başarıyla Tamamlandı!</h3>
-                                <p style="color: #9ca3af; font-size: 13px; margin-bottom: 15px; line-height: 1.6;">
-                                    Tüm soruları doğru çözdün fıstık! Harikasın.
-                                </p>
-                                <span style="color: #ff4d79; font-weight: 600; font-size: 12px; display: block;"></span>
-                            </div>
-
-                            <!-- Puzzle alanının aşağıda sapasağlam durmasını sağlıyoruz -->
-                            <div class="samet-gift-card" style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 25px; margin-top: 20px;">
-                                <div class="luxury-badge" style="background: rgba(255, 77, 121, 0.1); color: #ff4d79; margin-bottom: 15px;">Puzzle</div>
-                                <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 8px;">Bu da Samet'in Hediyesi</h3>
-                                <p style="font-size: 12px; color: #a1a1aa; line-height: 1.6; margin-bottom: 15px;">Bu puzzle'ı çözüp hediyemi verebilir misin?</p>
-                                
-                                <div id="puzzle-container" class="hidden" style="margin: 20px auto; width: 270px; height: 270px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 2px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255, 77, 121, 0.3); border-radius: 12px; overflow: hidden; position: relative;">
-                                    <!-- Parçalar buraya gelecek -->
-                                </div>
-
-                                <button id="start-puzzle-btn" class="btn" style="width: 100%; background: linear-gradient(135deg, #7b2cbf, #ff4d79); font-size: 12px;" onclick="startSametPuzzle()">Puzzle'ı başlat 🧩</button>
-                            </div>
-                        `;
-                    }
+            btn.onclick = (e) => {
+                if (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
                 }
-            );
-            
-            return false;
-        } else {
-            handleWrongAnswer(btn);
-        }
-    };
+
+                if (opt.correct) {
+                    // 📌 [SUNUCUYA KİLİTLE]: Quiz bittiğini Google Apps Script'e bildiriyoruz!
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=completeGame&type=quiz`);
+
+                    showQuizWarn("🏆", "", 
+                        `<div style="text-align: center;">
+                            <span style="font-size: 28px; font-weight: 900; color: #ff4d79; display: block; margin-bottom: 10px;">A+</span>
+                            <p style="font-size: 14px; color: #fff; font-weight: 700; margin-bottom: 10px;">Quizi Başarıyla Tamamladın!</p>
+                         </div>`, 
+                        "Tamam", () => {
+                            quizCurrentQuestion = 999; 
+                            renderQuizCompletedState();
+                        }
+                    );
+                    return false;
+                } else {
+                    handleWrongAnswer(btn);
+                }
+            };
             optionsContainer.appendChild(btn);
         });
     }
 }
 
-// Yanlış Cevaplarda Şık Titretme Yardımcısı
 function handleWrongAnswer(element) {
     element.classList.add("quiz-option-wrong");
     setTimeout(() => {
@@ -1045,11 +959,7 @@ function handleWrongAnswer(element) {
     }, 400);
 }
 
-// =========================================================================
-// ⚽ SANE ALT KATEGORİ KUTUSU (şıkkın altında açılır, ekran kaymaz)
-// =========================================================================
 function openSaneSubQuiz(saneBtn, optionsContainer) {
-    // Diğer şıkları pasifleştir, Sane'yi seçili işaretle
     optionsContainer.querySelectorAll(".quiz-option-btn").forEach(b => {
         if (b !== saneBtn) {
             b.style.opacity = "0.2";
@@ -1060,7 +970,6 @@ function openSaneSubQuiz(saneBtn, optionsContainer) {
     saneBtn.style.background = "rgba(0, 255, 102, 0.05)";
     saneBtn.style.pointerEvents = "none";
 
-    // Alt soru kutusunu Sane şıkkının hemen altına yerleştir
     const box = document.createElement("div");
     box.className = "sane-sub-box";
     saneBtn.insertAdjacentElement("afterend", box);
@@ -1110,19 +1019,14 @@ function openSaneSubQuiz(saneBtn, optionsContainer) {
     }
 }
 
-// =========================================================================
-// 🥣 CACIK PATLAMASI (tıklanan şık patlar, cacıklar içinden saçılır)
-// =========================================================================
 function triggerCacikGrid(optionsContainer, clickedBtn) {
     const areaHeight = optionsContainer.offsetHeight;
 
-    // Patlama merkezini hesapla: tıklanan butonun alan içindeki yüzdesel konumu
     const areaRect = optionsContainer.getBoundingClientRect();
     const btnRect = clickedBtn.getBoundingClientRect();
     const originX = ((btnRect.left + btnRect.width / 2 - areaRect.left) / areaRect.width) * 100;
     const originY = ((btnRect.top + btnRect.height / 2 - areaRect.top) / areaRect.height) * 100;
 
-    // Diğer şıklar anında kaybolmasın, hızlıca sönsün
     optionsContainer.querySelectorAll(".quiz-option-btn").forEach(b => {
         if (b !== clickedBtn) {
             b.style.transition = "opacity 0.2s ease";
@@ -1130,11 +1034,9 @@ function triggerCacikGrid(optionsContainer, clickedBtn) {
         }
     });
 
-    // Tıklanan buton şişip patlıyor
     clickedBtn.classList.add("cacik-exploding");
 
     setTimeout(() => {
-        // Patlama sonrası: alanı hazırla
         optionsContainer.innerHTML = "";
         optionsContainer.classList.add("cacik-area-mode");
         optionsContainer.style.height = areaHeight + "px";
@@ -1158,14 +1060,12 @@ function triggerCacikGrid(optionsContainer, clickedBtn) {
             btn.className = "quiz-option-btn cacik-scatter-btn";
             btn.textContent = "🥣 Cacık";
 
-            // Nihai (hedef) konum: kendi hücresi içinde rastgele nokta
             const jitterX = Math.random() * (cellW * 0.45);
             const jitterY = Math.random() * (cellH * 0.5);
             const targetLeft = cell.c * cellW + jitterX;
             const targetTop = cell.r * cellH + jitterY;
             const rot = (Math.random() * 16 - 8).toFixed(1);
 
-            // BAŞLANGIÇ: patlama merkezinde, minicik
             btn.style.left = originX + "%";
             btn.style.top = originY + "%";
             btn.style.transform = `scale(0.1) rotate(${rot}deg)`;
@@ -1190,7 +1090,6 @@ function triggerCacikGrid(optionsContainer, clickedBtn) {
 
             optionsContainer.appendChild(btn);
 
-            // SAÇILMA: merkezi konumdan hedef konuma yaylı uçuş (her biri minik gecikmeyle)
             setTimeout(() => {
                 btn.style.transition = "left 0.55s cubic-bezier(0.34, 1.4, 0.64, 1), top 0.55s cubic-bezier(0.34, 1.4, 0.64, 1), transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.3s ease";
                 btn.style.opacity = "1";
@@ -1198,24 +1097,20 @@ function triggerCacikGrid(optionsContainer, clickedBtn) {
                 btn.style.top = targetTop + "%";
                 btn.style.transform = `scale(1) rotate(${rot}deg)`;
 
-                // Uçuş bitince transition'ı kaldırıp kıpırdama animasyonunu başlat
                 setTimeout(() => {
                     btn.style.transition = "";
                     btn.style.animationDelay = "0s";
                     btn.style.animationDuration = (2.2 + Math.random() * 2).toFixed(2) + "s";
                     btn.classList.add("cacik-wiggling");
                 }, 600);
-            }, 30 + i * 25); // butonlar sırayla fışkırır, patlama hissi verir
+            }, 30 + i * 25);
         });
-    }, 380); // butonun şişip patlama süresi
+    }, 380);
 }
 
-// =========================================================================
-// 🏎️ ÇİFT KATMANLI SLIDE (şık yalnızca kullanıcının kaydırdığı kadar kayar)
-// =========================================================================
 function initDoubleLayerSlide(handle) {
     let startX = 0;
-    let baseX = 0;      // şıkkın en son bırakıldığı konum
+    let baseX = 0;      
     let currentX = 0;
     let isDragging = false;
 
@@ -1223,7 +1118,6 @@ function initDoubleLayerSlide(handle) {
         if (!isDragging) return;
         currentX = baseX + (clientX - startX);
 
-        // Sınır: kendi genişliğinden fazla kaymasın
         const limit = handle.offsetWidth;
         if (currentX > limit) currentX = limit;
         if (currentX < -limit) currentX = -limit;
@@ -1234,10 +1128,9 @@ function initDoubleLayerSlide(handle) {
     function onEnd() {
         if (!isDragging) return;
         isDragging = false;
-        baseX = currentX; // bırakıldığı yerde kalır, geri yaylanma/fırlama yok
+        baseX = currentX;
     }
 
-    // Fare olayları
     handle.addEventListener('mousedown', (e) => {
         isDragging = true;
         startX = e.clientX;
@@ -1247,7 +1140,6 @@ function initDoubleLayerSlide(handle) {
     window.addEventListener('mousemove', (e) => onMove(e.clientX));
     window.addEventListener('mouseup', onEnd);
 
-    // Dokunmatik olaylar
     handle.addEventListener('touchstart', (e) => {
         isDragging = true;
         startX = e.touches[0].clientX;
@@ -1273,7 +1165,6 @@ function startSametPuzzle() {
 
     puzzleState = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
-    // Karıştır
     do {
         puzzleState.sort(() => Math.random() - 0.5);
     } while (isPuzzleSolved()); 
@@ -1318,7 +1209,10 @@ function handlePieceClick(index) {
         selectedPieceIdx = null;
         renderPuzzlePieces();
 
-  if (isPuzzleSolved()) {
+        if (isPuzzleSolved()) {
+            // 📌 [SUNUCUYA KİLİTLE]: Puzzle bittiğini Google Apps Script'e bildiriyoruz!
+            fetch(`${GOOGLE_SCRIPT_URL}?action=completeGame&type=puzzle`);
+
             setTimeout(() => {
                 showQuizWarn(
                     "🎁", 
@@ -1326,15 +1220,7 @@ function handlePieceClick(index) {
                     "Lina seni gülümsettiyse;<br><br><strong style='color:#ff4d79; font-size:15px;'>Samet'in hediyesi: 5 veyaaa 10 adet gıdından öpmek :)</strong>", 
                     "Tamam", 
                     () => { 
-                        const giftCard = document.querySelector('.samet-gift-card');
-                        if (giftCard) {
-                            giftCard.innerHTML = `
-                                <div style="text-align: center; padding: 15px 0;">
-                                    <h4 style="color:#00ff66; font-size: 14px; font-weight:700;">Teşekkür ederim.</h4>
-                                    <p style="font-size: 11px; color:#a1a1aa; margin-top:5px;">Seni çok seviyorum!</p>
-                                </div>
-                            `;
-                        }
+                        renderPuzzleCompletedState();
                     }
                 );
             }, 300);
@@ -1422,9 +1308,10 @@ function closeSpotifyConfirm(result) {
     spotifyConfirmCallback = null;
 }
 
-
+// ==========================================
+// 📍 TAMAMEN KONUMA BAĞIMLI LOKASYON MOTORU
+// ==========================================
 const DURAK_KOORDINATLARI = {
-       
     1: { lat: 41.02227415435072, lon: 29.176402954621224 }, 
     2: { lat: 41.02564991143109, lon: 28.974085681608297 }, 
     3: { lat: 41.02692772829609, lon: 28.974277791128017 }, 
@@ -1433,7 +1320,6 @@ const DURAK_KOORDINATLARI = {
 
 const YAKINLIK_SINIRI_METRE = 75; 
 
-// İki konum arası mesafe hesaplama (Hızlı Haversine Formülü)
 function hesaplaMesafe(lat1, lon1, lat2, lon2) {
     const R = 6371e3;
     const phi1 = lat1 * Math.PI / 180;
@@ -1446,43 +1332,33 @@ function hesaplaMesafe(lat1, lon1, lat2, lon2) {
     return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
 }
 
-// ==========================================
-// 📍 TAMAMEN KONUMA BAĞIMLI LOKASYON MOTORU
-// ==========================================
 function rotaIsiklariniGuncelle() {
-    // 🛠️ [GİZLİ TEST MODU]: URL'de ?durak=X parametresi var mı kontrol et
     const urlParams = new URLSearchParams(window.location.search);
-    const testDurak = urlParams.get('durak'); // Örn: ?durak=2
+    const testDurak = urlParams.get('durak');
 
     if (testDurak) {
         console.log(`🛠️ Test Modu Aktif: ${testDurak}. durak taklit ediliyor.`);
         
-        // Önce tüm durakları sönük yap
         document.querySelectorAll(".timeline-item").forEach(el => {
             el.classList.remove("active-step");
         });
         const tamamlandiKutusu = document.getElementById("rota-tamamlandi-kutusu");
         if (tamamlandiKutusu) tamamlandiKutusu.classList.add("hidden");
 
-        // Seçtiğin durağın ışığını anında yak!
         const hedefDurakEl = document.querySelector(`.timeline-item[data-durak="${testDurak}"]`);
         if (hedefDurakEl) {
             hedefDurakEl.classList.add("active-step");
             
-            // Eğer son durak test ediliyorsa (yani 4) tamamlandı kutusunu da göster
             const toplamDurakSayisi = Object.keys(DURAK_KOORDINATLARI).length;
             if (parseInt(testDurak) === toplamDurakSayisi) {
                 if (tamamlandiKutusu) tamamlandiKutusu.classList.remove("hidden");
             }
         }
-        return; // Test modu aktifse gerçek GPS sorgusuna HİÇ BULAŞMA!
+        return;
     }
 
-    // ----------------------------------------------------
-    // GERÇEK GPS MOTORU (Eğer URL'de test parametresi yoksa burası çalışır):
     if (!navigator.geolocation) return;
 
-    // Önce her şeyi sönük yapıyoruz
     document.querySelectorAll(".timeline-item").forEach(el => {
         el.classList.remove("active-step");
     });
@@ -1515,5 +1391,9 @@ function rotaIsiklariniGuncelle() {
         { enableHighAccuracy: true, timeout: 3000, maximumAge: 10000 }
     );
 }
-// Sayfa her açıldığında konumu anında tara ve rota ışıklarını yak!
-window.addEventListener('DOMContentLoaded', rotaIsiklariniGuncelle);
+
+// Sayfa yüklendiğinde hem konumu hem de kilit durumunu tara
+window.addEventListener('DOMContentLoaded', () => {
+    rotaIsiklariniGuncelle();
+    checkGlobalGameStatus();
+});

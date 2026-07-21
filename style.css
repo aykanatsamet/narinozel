@@ -195,8 +195,8 @@ body {
 .side-menu-content {
     position: absolute;
     top: 0;
-    right: -300px;
-    width: 300px;
+    right: -250px;
+    width: 250px;
     height: 100%;
     background: #09090b;
     border-left: 1px solid rgba(255, 255, 255, 0.04);

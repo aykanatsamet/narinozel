@@ -97,8 +97,33 @@ window.addEventListener('touchstart', function(e) {
 // ==========================================
 function toggleMenu() {
     const sideMenu = document.getElementById('side-menu');
-    if (sideMenu) {
-        sideMenu.classList.toggle('open');
+    if (!sideMenu) return;
+
+    sideMenu.classList.toggle('open');
+
+    // 🔧 DÜZELTME: Menü açıkken arka plandaki sayfanın scroll edilmesini
+    // engelliyoruz. Önceden hiçbir kilit yoktu, bu yüzden menü açıkken
+    // arka sayfa kayabiliyordu ve bu da menü panelinin altında/üstünde
+    // ufak boşlukların belirmesine (senkron kaymamasına) yol açıyordu.
+    // position:fixed tekniği mobilde (özellikle iOS Safari'de)
+    // overflow:hidden'dan daha güvenilir çalışır.
+    if (sideMenu.classList.contains('open')) {
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+        document.body.dataset.scrollLockY = String(scrollY);
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.width = '100%';
+    } else {
+        const savedScrollY = parseInt(document.body.dataset.scrollLockY || '0', 10);
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
+        window.scrollTo(0, savedScrollY);
+        delete document.body.dataset.scrollLockY;
     }
 }
 
@@ -127,6 +152,18 @@ function selectTab(tabId) {
         // 📌 [YENİ TETİKLEYİCİ]: Eğer galeri sekmesi açıldıysa, Drive verilerini çek!
         if (tabId === 'gallery') {
             fetchDriveMedia();
+        }
+
+        // 📌 [DÜZELTME]: Spotify sekmesi açıldığında iframe'in gerçek src'sini
+        // data-src'den yüklüyoruz. Bu satır daha önce hiç eklenmemişti, bu
+        // yüzden playlist hiçbir zaman görünmüyordu (iframe'in src'si hep
+        // boştu). Sadece ilk açılışta bir kez yükler, sonraki geçişlerde
+        // tekrar yeniden yüklemez.
+        if (tabId === 'spotify') {
+            const spotifyIframe = document.getElementById('spotify-embed');
+            if (spotifyIframe && !spotifyIframe.getAttribute('src')) {
+                spotifyIframe.src = spotifyIframe.dataset.src;
+            }
         }
 
         // 📌 [YENİ TETİKLEYİCİ]: Eğer oyunlar sekmesi açıldıysa, quiz/puzzle

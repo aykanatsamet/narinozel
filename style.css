@@ -41,6 +41,14 @@ body {
 #intro-screen.tv-off {
     transform: scaleY(0.005) scaleX(0);
     opacity: 0;
+    /* 🔧 DONMA/FREEZE DÜZELTMESİ: display:none JS tarafında ancak bu class
+       eklendikten ~500ms SONRA uygulanıyor. Bu ara sürede (ve JS'in herhangi
+       bir sebeple gecikmesi/aksaması durumunda) bu tam ekran katman hâlâ
+       DOM'da durup pointer-events varsayılan olarak "auto" olduğu için
+       altındaki TÜM dokunuşları/tıklamaları yutabiliyordu — sayfa "donmuş"
+       gibi görünüyordu. display:none beklemeden, animasyon başlar başlamaz
+       pointer-events'i kapatıyoruz ki bu asla bir daha olmasın. */
+    pointer-events: none;
 }
 
 #intro-date {
@@ -746,9 +754,6 @@ body {
     height: 260px;
     border-radius: 22px;
     overflow: hidden;
-    /* DÜZELTME: Düz siyah yerine, arkada bir video karesi varmış hissi veren
-       yumuşak renkli ışık lekeleri. Üstteki blur'lu overlay bunları bulanıklaştırınca
-       "gizlenmiş video" görüntüsü oluşuyor */
     background:
         radial-gradient(circle at 22% 30%, rgba(255, 77, 121, 0.55) 0%, transparent 42%),
         radial-gradient(circle at 78% 22%, rgba(130, 90, 255, 0.40) 0%, transparent 48%),
@@ -758,7 +763,6 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Işık lekelerine çok yavaş bir süzülme: arkada "oynayan bir şey" varmış hissi */
 .video-locked::before {
     content: '';
     position: absolute;
@@ -775,9 +779,6 @@ body {
     to   { transform: translate(4%, 3%) scale(1.15); }
 }
 
-/* Kilitliyken içindeki boş (siyah) video elemanı görünmez olsun ki
-   arkadaki renkli katmanı kapatmasın. Kilit açılınca (video-locked
-   sınıfı kalkınca) video normal şekilde görünür. */
 .video-locked video {
     opacity: 0;
 }
@@ -788,8 +789,6 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    /* DÜZELTME: Neredeyse opak siyah yerine saydam karartma —
-       arkadaki renkli "video" katmanı blur'un içinden hayal meyal görünür */
     background: rgba(8, 8, 12, 0.35);
     backdrop-filter: blur(16px) saturate(1.2);
     -webkit-backdrop-filter: blur(16px) saturate(1.2);
@@ -850,11 +849,11 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.85); /* Arkadaki puzzle'ı tamamen karartıp gizlemek için */
+    background: rgba(0, 0, 0, 0.85);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 99999; /* Sayfadaki her şeyin ama her şeyin üstünde olmasını sağlar */
+    z-index: 99999;
 }
 
 #note-paper {
@@ -870,7 +869,6 @@ body {
     transform-origin: center bottom;
 }
 
-/* Uçup Gitme Animasyonu */
 .paper-fly-away {
     animation: flyOut 1.2s forwards cubic-bezier(0.25, 1, 0.5, 1);
 }
@@ -1006,47 +1004,42 @@ body {
 /* ==========================================
    GÜNCEL AKICI SCROLL & MİNİMAL KART STİLLERİ
    ========================================== */
-
-/* Ana sayfada ve genel sekme alanlarında daha fazla scroll kayabilmesi için geniş alt boşluk */
 .content-wrapper {
-    padding-bottom: 180px !important; /* Alt tarafta Maps entegrasyonu ve rahat kaydırma için bolca nefes alanı */
+    padding-bottom: 180px !important;
 }
 
-/* Rota kartlarının boyutlarını hafifçe küçülttük (Daha kompakt ve tatlı duruyorlar) */
 .vertical-timeline {
-    gap: 18px !important; /* Kartların arasındaki boşluk daraltıldı */
+    gap: 18px !important;
 }
 
 .timeline-info {
-    padding: 14px 18px !important; /* Kart içi dolgular küçültüldü */
+    padding: 14px 18px !important;
     border-radius: 16px !important;
 }
 
 .timeline-info h4 {
-    font-size: 14px !important; /* Başlıklar hafif küçültüldü */
+    font-size: 14px !important;
 }
 
 .timeline-info p {
-    font-size: 12px !important; /* Açıklamalar daha kibar hale getirildi */
+    font-size: 12px !important;
     color: #8a8a93 !important;
 }
 
 .timeline-dot {
-    width: 34px !important; /* Sol taraftaki sayı çemberi de kartlarla uyumlu küçültüldü */
+    width: 34px !important;
     height: 34px !important;
     font-size: 11px !important;
 }
 
 .timeline-line {
-    left: 17px !important; /* Çizgi yeni çember boyutuna göre ortalandı */
+    left: 17px !important;
 }
 
-/* Üzerine gelince şişip büyüme animasyonu (Hafif ve sarsıntısız asil bir büyüme) */
 .timeline-item:hover {
-    transform: scale(1.025) translateX(3px) !important; /* Hafif büyüme ve milimetrik sağa kayma */
+    transform: scale(1.025) translateX(3px) !important;
 }
 
-/* Upload kutusundaki alt satıra geçiş ve estetik aralık */
 .upload-label {
     display: flex;
     flex-direction: column;
@@ -1061,7 +1054,7 @@ body {
 .upload-subtext {
     display: block !important;
     margin-top: 6px !important;
-    color: #ff4d79 !important; /* Fotoğraf/Video uyarısını pembe tonlarıyla daha şık yaptık */
+    color: #ff4d79 !important;
     font-weight: 500;
 }
 
@@ -1080,7 +1073,6 @@ body {
     text-align: center;
 }
 
-/* Kendi etrafında dönmeyen, sadece yaşayan bir kalp gibi yavaşça atan lüks tasarım */
 .heart-loader {
     font-size: 45px;
     display: inline-block;
@@ -1089,7 +1081,6 @@ body {
     animation: luxury-heartbeat 1.8s infinite cubic-bezier(0.215, 0.610, 0.355, 1);
 }
 
-/* Kalbin arkasında yayılan o büyülü neon halka efekti */
 .heart-loader::after {
     content: '❤️';
     position: absolute;
@@ -1113,62 +1104,29 @@ body {
     animation: fade-pulse 1.8s infinite ease-in-out;
 }
 
-/* Kalbin asilce büyümesi ve derin nefes alıp vermesi (Beat) */
 @keyframes luxury-heartbeat {
-    0% {
-        transform: scale(0.95);
-    }
-    15% {
-        transform: scale(1.1); /* Birinci güçlü vuruş */
-    }
-    30% {
-        transform: scale(0.98); /* Geri çekilme */
-    }
-    45% {
-        transform: scale(1.15); /* İkinci asıl büyük vuruş */
-    }
-    100% {
-        transform: scale(0.95); /* Yavaş sönümleme */
-    }
+    0% { transform: scale(0.95); }
+    15% { transform: scale(1.1); }
+    30% { transform: scale(0.98); }
+    45% { transform: scale(1.15); }
+    100% { transform: scale(0.95); }
 }
 
-/* Kalp her attığında arkasından yayılan pembe ışık dalgası */
 @keyframes aura-expand {
-    0% {
-        transform: scale(0.95);
-        opacity: 0.8;
-    }
-    15% {
-        transform: scale(1.4);
-        opacity: 0.5;
-    }
-    45% {
-        transform: scale(1.8);
-        opacity: 0; /* Dalga tamamen genişleyip havada yok oluyor */
-    }
-    100% {
-        transform: scale(0.95);
-        opacity: 0;
-    }
+    0% { transform: scale(0.95); opacity: 0.8; }
+    15% { transform: scale(1.4); opacity: 0.5; }
+    45% { transform: scale(1.8); opacity: 0; }
+    100% { transform: scale(0.95); opacity: 0; }
 }
 
-/* Yazının şıkça nefes alıp vermesi */
 @keyframes fade-pulse {
-    0%, 100% {
-        opacity: 0.4;
-        color: rgba(255, 255, 255, 0.4);
-    }
-    50% {
-        opacity: 1;
-        color: #ff4d79; /* Yazı parladığında hafifçe tatlı pembe renge dönüyor */
-    }
+    0%, 100% { opacity: 0.4; color: rgba(255, 255, 255, 0.4); }
+    50% { opacity: 1; color: #ff4d79; }
 }
 
 /* ==========================================
    🎵 PREMIUM SPOTIFY SEKME TASARIMI & KAPSAYICI
    ========================================== */
-
-/* Sekme aktif olduğunda içerideki container'ın görünmesini kesinleştiriyoruz */
 .tab-content.active-content .spotify-container {
     display: flex !important;
     visibility: visible !important;
@@ -1178,21 +1136,20 @@ body {
 .spotify-container {
     width: 100%;
     margin: 0 auto;
-    display: none; /* Aktif değilken tarayıcıyı yormasın */
+    display: none;
     flex-direction: column;
     gap: 25px;
     animation: fadeIn 0.5s ease-in-out forwards;
 }
 
-/* Spotify Player Yükseklik ve Genişlik Sabitleme */
 .spotify-player-wrapper {
     width: 100%;
-    height: 380px !important; /* Çerçevenin ekranda kaybolmasını kesin olarak önler */
+    height: 380px !important;
     border-radius: 20px;
     overflow: hidden;
     border: 1px solid rgba(255, 77, 121, 0.2) !important;
     box-shadow: 0 10px 30px rgba(255, 77, 121, 0.08) !important;
-    background: #0d0d11; /* Yüklenirken arkada duracak asil renk */
+    background: #0d0d11;
 }
 
 .spotify-player-wrapper iframe {
@@ -1202,7 +1159,6 @@ body {
     border: none;
 }
 
-/* Spotify Arama Sonuç Satırları */
 .spotify-results-list > div {
     display: flex;
     align-items: center;
@@ -1221,21 +1177,14 @@ body {
 }
 
 @keyframes fadeIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(10px); 
-    }
-    to { 
-        opacity: 1; 
-        transform: translateY(0); 
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Spotify öneri kutusu */
 .suggest-box {
     display: none;
     position: absolute;
-    top: calc(100% + 8px);   /* input'un hemen altı */
+    top: calc(100% + 8px);
     left: 0;
     right: 0;
     z-index: 999;
@@ -1257,8 +1206,6 @@ body {
 /* ==========================================
    🎯 PREMIUM INTERACTIVE QUIZ STYLES V3
    ========================================== */
-
-/* Yanlış Şık Titreme Animasyonu */
 .quiz-option-wrong {
     background: rgba(255, 77, 121, 0.08) !important;
     border-color: #ff4d79 !important;
@@ -1272,7 +1219,6 @@ body {
     40%, 80% { transform: translateX(6px); }
 }
 
-/* Kendal Efe Şıkkının Özel Parlama Tasarımı */
 .kendal-efe-aurora {
     font-family: 'Space Grotesk', sans-serif !important;
     font-weight: 800 !important;
@@ -1288,7 +1234,6 @@ body {
     50% { border-color: #ff4d79; box-shadow: 0 0 25px rgba(255, 77, 121, 0.35); }
 }
 
-/* Cacık Balonlarının Pozisyonlanması */
 .cacik-bubble {
     position: absolute;
     background: rgba(255, 255, 255, 0.03);
@@ -1312,15 +1257,14 @@ body {
     to { transform: translateY(-15px) rotate(5deg); }
 }
 
-
 .quiz-option-btn {
     width: 100%;
-    height: 48px;                 /* ← sabit yükseklik */
-    display: flex;                /* ← dikey ortalama için */
+    height: 48px;
+    display: flex;
     align-items: center;
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 0 20px;              /* ← dikey padding kalktı, yüksekliği height yönetiyor */
+    padding: 0 20px;
     border-radius: 16px;
     color: #fff;
     font-size: 13px;
@@ -1335,11 +1279,10 @@ body {
     border-color: rgba(255, 77, 121, 0.2);
 }
 
-/* Sane alt kategori kutusu */
 .sane-sub-box {
     margin: 8px 0 4px 14px;
     padding: 12px 14px;
-    min-height: 150px;              /* alt sorular arası zıplamayı önler */
+    min-height: 150px;
     border-left: 2px solid rgba(0, 255, 102, 0.4);
     background: rgba(255, 255, 255, 0.02);
     border-radius: 0 14px 14px 0;
@@ -1368,7 +1311,7 @@ body {
 
 .sane-sub-options {
     display: grid;
-    grid-template-columns: 1fr 1fr;   /* 2x2 kompakt grid */
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
 }
 
@@ -1391,12 +1334,11 @@ body {
 .double-layer-option {
     position: relative;
     width: 100%;
-    height: 48px;                 /* ← quiz-option-btn ile birebir aynı */
+    height: 48px;
     border-radius: 16px;
     overflow: hidden;
 }
 
-/* Alt katman: saklı şık */
 .layer-under {
     position: absolute;
     inset: 0;
@@ -1413,7 +1355,6 @@ body {
     transition: 0.2s;
 }
 
-/* Üst katman: normal şıkla BİREBİR aynı görünmeli */
 .layer-upper {
     position: absolute;
     inset: 0;
@@ -1423,27 +1364,25 @@ body {
     font-size: 14px;
     font-weight: 700;
     color: #fff;
-    background: #14141c;        /* ALTINI GÖSTERMEMESİ İÇİN OPAK OLMALI */
+    background: #14141c;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 14px;
     cursor: grab;
     user-select: none;
     -webkit-user-select: none;
-    touch-action: pan-y;        /* dikey sayfa kaydırmayı bozmasın */
+    touch-action: pan-y;
     will-change: transform;
 }
 
 .layer-upper:active {
     cursor: grabbing;
 }
-/* 🥣 Cacık alanı: 4 şıkkın yerini kaplayan serbest saha */
 .cacik-area-mode {
     position: relative !important;
     display: block !important;
     overflow: hidden;
 }
 
-/* Dağınık cacık butonları: normal şık görünümünde ama serbest konumlu */
 .cacik-scatter-btn {
     position: absolute !important;
     width: auto !important;
@@ -1458,14 +1397,11 @@ body {
     z-index: 1;
 }
 
-/* Hafif kıpırdama: yukarı-aşağı süzülme + minik eğim değişimi */
-/* DÜZELTME: margin-top yerine transform (her karede layout hesaplatmaz, GPU'da çalışır) */
 @keyframes cacikWiggle {
     from { transform: translateY(0px); }
     to   { transform: translateY(-8px); }
 }
 
-/* Tıklanan şıkkın şişip patlaması */
 .cacik-exploding {
     animation: cacikExplode 0.38s ease-in forwards !important;
     z-index: 5;
@@ -1473,17 +1409,14 @@ body {
 
 @keyframes cacikExplode {
     0%   { transform: scale(1); opacity: 1; }
-    60%  { transform: scale(1.25); opacity: 1; }   /* şişme */
-    100% { transform: scale(1.6); opacity: 0; }    /* patlayıp yok olma */
+    60%  { transform: scale(1.25); opacity: 1; }
+    100% { transform: scale(1.6); opacity: 0; }
 }
 
-/* Saçılma bitince başlayan kıpırdama */
 .cacik-wiggling {
-    /* DÜZELTME: Süre (1.2s) eksikti, bu yüzden animasyon geçersiz sayılıyor ve hiç çalışmıyordu */
     animation: cacikWiggle 1.2s infinite ease-in-out alternate;
 }
 
-/* Tıklanınca küçülüp sönme */
 .cacik-popped {
     transform: scale(0) !important;
     opacity: 0;
@@ -1494,8 +1427,6 @@ body {
 /* ==========================================
    🖋️ HIGH-CONTRAST LUXURY MEKTUP & ULTRA AKICI 3D ANİMASYONLAR
    ========================================== */
-
-/* Kağıdın Ana Kapsayıcısı (Fildişi / Parşömen Dokusu) */
 .paper-luxury-scroll {
     position: relative;
     background: #fdfbf7;
@@ -1504,50 +1435,30 @@ body {
     border-radius: 28px;
     width: 90%;
     max-width: 440px;
-    max-height: 80vh; /* Ekranın %80'ini aşmaz, ortada kalır */
+    max-height: 80vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    margin: auto; /* Ekranı tam ortalama garantisi */
-    
-    /* 3D Giriş Animasyonu */
+    margin: auto;
     transform-origin: center bottom;
     animation: paperCinematicIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* Giriş Animasyonu */
 @keyframes paperCinematicIn {
-    0% {
-        opacity: 0;
-        transform: scale(0.5) translateY(100px) rotateX(-45deg);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1) translateY(0) rotateX(0deg);
-    }
+    0% { opacity: 0; transform: scale(0.5) translateY(100px) rotateX(-45deg); }
+    100% { opacity: 1; transform: scale(1) translateY(0) rotateX(0deg); }
 }
 
-/* Giderken Çalışacak Gökyüzüne Süzülerek Kaybolma Sınıfı */
 .paper-fly-away {
     pointer-events: none !important;
     animation: paperElegantOut 1.0s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
 }
 
-/* Yeni, Asil ve Pürüzsüz Yukarı Süzülme Animasyonu */
 @keyframes paperElegantOut {
-    0% {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-        filter: blur(0px);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(0.9) translateY(-120px);
-        filter: blur(8px);
-    }
+    0% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); }
+    100% { opacity: 0; transform: scale(0.9) translateY(-120px); filter: blur(8px); }
 }
 
-/* Sabit Başlık Alanı */
 .paper-header-premium {
     padding: 22px 25px 15px;
     font-family: 'Space Grotesk', sans-serif;
@@ -1560,10 +1471,9 @@ body {
     background: #fdfbf7;
 }
 
-/* Kaydırılabilir Yazı Alanı */
 .paper-body-scrollable {
     padding: 20px 25px;
-    overflow-y: auto; /* İçeriğin kaymasını sağlar */
+    overflow-y: auto;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
@@ -1571,7 +1481,6 @@ body {
     background: #fdfbf7;
 }
 
-/* İnce ve Estetik Kaydırma Çubuğu */
 .paper-body-scrollable::-webkit-scrollbar {
     width: 5px;
 }
@@ -1589,7 +1498,6 @@ body {
     background: rgba(255, 77, 121, 0.6);
 }
 
-/* Mektup Paragrafları (Cam Gibi Okunabilir Koyu Füme) */
 .mektup-paragraf {
     font-size: 14.5px;
     line-height: 1.8;
@@ -1599,7 +1507,6 @@ body {
     font-weight: 500;
 }
 
-/* Paragraf Başlangıç ve Bitiş Vurguları */
 .mektup-paragraf.highlight {
     font-size: 16px;
     font-weight: 800;
@@ -1615,14 +1522,12 @@ body {
     margin-top: 5px;
 }
 
-/* Sabit Alt Tuş Alanı */
 .paper-footer-premium {
     padding: 15px 25px 22px;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
     background: #fdfbf7;
 }
 
-/* Özel Pembe Buton */
 .btn-luxury-paper {
     width: 100%;
     padding: 14px;
@@ -1650,11 +1555,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 20px 0 20px 0; /* Buton dururken altındaki rotayla mesafesini korur */
+    margin: 20px 0 20px 0;
     position: relative;
     z-index: 10;
     width: 100%;
-    /* Kaybolurken pürüzsüzce kapanma geçişi */
     transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), 
                 transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), 
                 max-height 0.6s cubic-bezier(0.25, 1, 0.5, 1), 
@@ -1665,20 +1569,19 @@ body {
     overflow: hidden;
 }
 
-/* Buton Gittikten Sonra VIP Adventure'ın Yapışmasını Önleyen Sihirli Sınıf */
 .mektup-btn-wrapper.fade-out-completely {
     opacity: 0 !important;
     transform: scale(0.8) !important;
-    max-height: 0 !important; /* Butonun yüksekliğini pürüzsüzce sıfırlar */
+    max-height: 0 !important;
     margin-top: 0 !important;
     padding: 0 !important;
     pointer-events: none !important;
-    margin-bottom: 45px !important; /* Aradaki o asil hava boşluğu korunur */
+    margin-bottom: 45px !important;
 }
 
 .envelope-btn {
     position: relative;
-    background: rgba(253, 251, 247, 0.12); /* Krem/Kemik Rengi lüks arka plan */
+    background: rgba(253, 251, 247, 0.12);
     border: 1px solid rgba(253, 251, 247, 0.35);
     padding: 12px 28px;
     border-radius: 50px;
@@ -1689,128 +1592,82 @@ body {
     gap: 10px;
     box-shadow: 0 0 20px rgba(253, 251, 247, 0.05);
     transition: all 0.3s ease;
-    
-    /* [YENİ] Periyodik titreme animasyonu (Sürekli aşırı hızlı sallanıp göz yormaz, asilce titrer ve durur) */
     animation: buttonVibrate 2.2s infinite ease-in-out;
 }
 
-/* Hover durumunda titreme durur ve buton asilce sabit kalır */
 .envelope-btn:hover {
     background: rgba(253, 251, 247, 0.22);
     border-color: rgba(253, 251, 247, 0.6);
     box-shadow: 0 0 30px rgba(253, 251, 247, 0.15);
-    animation: none; /* Üzerine gelince titremeyi tamamen keser */
+    animation: none;
 }
 
-/* Zarf İkonu */
 .envelope-icon {
     display: none;
 }
 
-/* Sana Bir Not Var Yazısı */
 .note-badge {
     font-family: 'Space Grotesk', sans-serif;
     font-size: 13px;
     font-weight: 700;
-    color: #ffffff; /* Saf beyaz yazı */
+    color: #ffffff;
     letter-spacing: 0.5px;
 }
 
-/* 🌟 PREMIUM PERIODIC VIBRATION (ASİL TİTREME) ANİMASYONU */
 @keyframes buttonVibrate {
-    /* İlk %50'lik dilimde (1.1 saniye) çok tatlı ve hızlıca titrer */
     0%, 50%, 100% { transform: translate(0, 0); }
     5%, 15%, 25%, 35%, 45% { transform: translate(-1.5px, -0.5px); }
     10%, 20%, 30%, 40% { transform: translate(1.5px, 0.5px); }
-    /* Diğer %50'lik dilimde ise tamamen sakin durarak gerçekçi bir bildirim hissi verir */
 }
 /* ==========================================
    💖 NOSTALJİK PİKSEL KALP YERLEŞİMİ (SABİTLENMİŞ BOŞLUKLU)
    ========================================== */
-
 .pixel-heart-container {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 55px; /* Kalp büyüdüğü için yüksekliği de hafif artırdık */
-    margin: 5px 0 35px 0; /* Rota ile arasındaki asil mesafeyi korur */
+    height: 55px;
+    margin: 5px 0 35px 0;
     position: relative;
     z-index: 5;
 }
 
-/* 8-Bit Dolgun Pembe Piksel Kalp */
-/* 8-Bit Kusursuz Dolgun Pembe Piksel Kalp */
-/* 8-Bit Kusursuz Dolgun Pembe Piksel Kalp (Nihai Premium Sürüm) */
 .pixel-heart {
     position: absolute;
     width: 3px;
     height: 3px;
     background: #ff4d79;
-    
-    /* 
-       Altın Oranlı Retro Piksel Haritası:
-       Üst omuzlar yumuşatıldı, orta vadi derinliği korundu, alt kavis kusursuz akışla sivri uca bağlandı.
-    */
     box-shadow: 
-        /* --- Sol Üst Lob (Yumuşatılmış Yuvarlak Omuz) --- */
         -3px -3px 0 #ff4d79, -6px -3px 0 #ff4d79, -9px -3px 0 #ff4d79,
         -12px 0px 0 #ff4d79, -12px 3px 0 #ff4d79, -12px 6px 0 #ff4d79,
-        
-        /* --- Sağ Üst Lob (Yumuşatılmış Yuvarlak Omuz) --- */
         3px -3px 0 #ff4d79, 6px -3px 0 #ff4d79, 9px -3px 0 #ff4d79,
         12px 0px 0 #ff4d79, 12px 3px 0 #ff4d79, 12px 6px 0 #ff4d79,
-        
-        /* --- Ortadaki Derin Vadi Boşluğu (Karakteristik Çukurluk) --- */
         0 0px 0 #ff4d79, 0 3px 0 #ff4d79, 0 6px 0 #ff4d79,
-        
-        /* --- Üst Orta Gövde Dolgusu --- */
         -3px 0px 0 #ff4d79, -3px 3px 0 #ff4d79, -3px 6px 0 #ff4d79,
         -6px 0px 0 #ff4d79, -6px 3px 0 #ff4d79, -6px 6px 0 #ff4d79,
         -9px 0px 0 #ff4d79, -9px 3px 0 #ff4d79, -9px 6px 0 #ff4d79,
         3px 0px 0 #ff4d79, 3px 3px 0 #ff4d79, 3px 6px 0 #ff4d79,
         6px 0px 0 #ff4d79, 6px 3px 0 #ff4d79, 6px 6px 0 #ff4d79,
         9px 0px 0 #ff4d79, 9px 3px 0 #ff4d79, 9px 6px 0 #ff4d79,
-        
-        /* --- Alt Gövde Akıcı Daralma Alanı (Kademeli Geçiş) --- */
         -9px 9px 0 #ff4d79, 9px 9px 0 #ff4d79,
         -6px 9px 0 #ff4d79, 6px 9px 0 #ff4d79, -3px 9px 0 #ff4d79, 3px 9px 0 #ff4d79, 0 9px 0 #ff4d79,
-        
-        /* --- Süzülen Alt Yay --- */
         -6px 12px 0 #ff4d79, 6px 12px 0 #ff4d79,
         -3px 12px 0 #ff4d79, 3px 12px 0 #ff4d79, 0 12px 0 #ff4d79,
-        
-        /* --- Sivri Uca Doğru Son Daralma --- */
         -3px 15px 0 #ff4d79, 3px 15px 0 #ff4d79, 0 15px 0 #ff4d79,
-        
-        /* --- Alt Uçtaki Kusursuz Tek Piksel Birleşimi --- */
         0 18px 0 #ff4d79;
-        
     image-rendering: pixelated;
-    
-    /* Yaşayan Kalp Atış Animasyonu */
     animation: pixelHeartBeat 1.4s infinite cubic-bezier(0.215, 0.610, 0.355, 1);
     transform: scale(1.9) translateY(-5px);
 }
-/* Retro Kalp Atışı (Heartbeat - Yeni Ölçeklerle Uyumlu) */
-@keyframes pixelHeartBeat {
-    0% {
-        transform: scale(1.9) translateY(-5px);
-    }
-    14% {
-        transform: scale(2.25) translateY(-5px); /* İlk güçlü vuruş */
-    }
-    28% {
-        transform: scale(2.05) translateY(-5px); /* Geri çekilme */
-    }
-    42% {
-        transform: scale(2.35) translateY(-5px); /* İkinci asıl vuruş */
-    }
-    70%, 100% {
-        transform: scale(1.9) translateY(-5px); /* Dinlenme */
-    }
-}
 
+@keyframes pixelHeartBeat {
+    0% { transform: scale(1.9) translateY(-5px); }
+    14% { transform: scale(2.25) translateY(-5px); }
+    28% { transform: scale(2.05) translateY(-5px); }
+    42% { transform: scale(2.35) translateY(-5px); }
+    70%, 100% { transform: scale(1.9) translateY(-5px); }
+}
 
 .folder-item-loading {
     display: flex;
@@ -1832,12 +1689,8 @@ body {
 }
 
 @keyframes heartPulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.3);
-    }
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.3); }
 }
 
 .puzzle-piece {
@@ -1858,8 +1711,6 @@ body {
     font-weight: bold;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     border: 1px solid rgba(255,255,255,0.05);
-    
-    /* 📌 EKLENEN SATIR: Parçaların öne fırlayıp popup'ı delmesini engeller */
     z-index: 1; 
 }
 
@@ -1868,28 +1719,21 @@ body {
     box-shadow: 0 0 10px rgba(255, 77, 121, 0.6);
     transform: scale(0.95);
 }
-/* 🌀 MODERN DÖNEN PEMBE SPINNER */
 .pink-loading-spinner {
     width: 45px;
     height: 45px;
-    border: 3px solid rgba(255, 77, 121, 0.1); /* Halkanın arkada kalan loş kısmı */
-    border-top: 3px solid #ff4d79;             /* Dönen pembe uç kısmı */
+    border: 3px solid rgba(255, 77, 121, 0.1);
+    border-top: 3px solid #ff4d79;
     border-radius: 50%;
     animation: spinInfinite 0.8s linear infinite;
     box-shadow: 0 0 15px rgba(255, 77, 121, 0.15);
 }
 
 @keyframes spinInfinite {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-
-/* 💖 AKTİF DURAK IŞIĞINI YAKAN STİLLER */
 .timeline-item.active-step {
     border-color: #ff4d79 !important;
     background: rgba(255, 77, 121, 0.04) !important;
@@ -1905,22 +1749,13 @@ body {
     border-color: #ff4d79 !important;
 }
 
-/* Diğer loş duraklar için hafif şeffaflık geçişi (daha şık durması için) */
 .timeline-item {
     transition: all 0.5s ease-in-out !important;
 }
 /* ==========================================
    📱 MOBİL PERFORMANS DÜZELTMELERİ
-   Telefonlarda donma/kasılmaya yol açan ağır
-   GPU efektlerini mobilde sadeleştirir.
-   Masaüstü görünümü etkilenmez.
    ========================================== */
 @media (max-width: 768px) {
-
-    /* Blur efektleri mobil GPU'lar için çok pahalı;
-       yerine daha koyu yarı saydam arka plan kullanıyoruz.
-       (.video-overlay bilinçli olarak listede YOK: Geleceğe Not'taki
-       saydam blur'lu kilit görüntüsü korunuyor — küçük alan, yükü az) */
     .side-menu-overlay,
     .popup-overlay,
     .delete-media-btn {
@@ -1936,24 +1771,19 @@ body {
         background: rgba(0, 0, 0, 0.92);
     }
 
-    /* ~60 box-shadow'lu pixel kalbin her karede yeniden ölçeklenmesi ağır;
-       kalp atışını yavaşlatarak GPU yükünü düşürüyoruz */
     .pixel-heart {
         animation-duration: 2.8s;
     }
 
-    /* Zarf butonundaki sürekli titreme animasyonunu mobilde kapat */
     .envelope-btn {
         animation: none;
     }
 
-    /* Blur'lu emoji halkası (aura) her karede yeniden blur hesaplatıyor; mobilde kapat */
     .heart-loader::after {
         display: none;
     }
 }
 
-/* Kullanıcı sistem ayarında animasyon azaltmayı seçtiyse sonsuz animasyonları durdur */
 @media (prefers-reduced-motion: reduce) {
     .pixel-heart,
     .envelope-btn,
@@ -1964,8 +1794,6 @@ body {
     }
 }
 
-/* Playlist arama kutusu: input 16px kalır (mobil zoom'u engeller)
-   ama placeholder küçük yazılır ki tamamı okunabilsin */
 #spotify-search-input::placeholder {
     font-size: 13px;
     color: rgba(255, 255, 255, 0.35);

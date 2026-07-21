@@ -1,5 +1,20 @@
 let introStarted = false;
 
+// 🔧 KALICI POPUP TAŞIMA: Tebrik/uyarı popup'ı (#quiz-warn-popup) HTML'de
+// .games-container'ın İÇİNDE tanımlı. Ancak biz .games-container'ın
+// innerHTML'ini (yükleniyor ekranı / "zaten çözüldü" ekranı göstermek için)
+// her değiştirdiğimizde bu popup da yanlışlıkla silinip gidiyordu - puzzle
+// çözüldüğünde tebrik kutusu bu yüzden görünmüyordu. Bunu önlemek için
+// popup'ı sayfa yüklenir yüklenmez kalıcı olarak <body>'nin altına
+// taşıyoruz, böylece .games-container'a ne yapılırsa yapılsın popup
+// her zaman DOM'da kalır.
+(function relocateQuizWarnPopup() {
+    const warnPopup = document.getElementById('quiz-warn-popup');
+    if (warnPopup) {
+        document.body.appendChild(warnPopup);
+    }
+})();
+
 // KURSUN GECIRMEZ ANA TETIKLEYICI
 function triggerGlobalIntro() {
     if (introStarted) return;
@@ -88,7 +103,7 @@ function selectTab(tabId) {
         // 📌 [YENİ TETİKLEYİCİ]: Eğer oyunlar sekmesi açıldıysa, quiz/puzzle
         // daha önce (herhangi bir cihazdan) çözülmüş mü kontrol et!
         if (tabId === 'games') {
-            checkGameProgress();
+            prepareGamesTab();
         }
 
     } else {
@@ -663,19 +678,62 @@ setTimeout(() => {
 // girilirse girilsin (localStorage'dan FARKLI OLARAK) aynı sonuç görünür.
 // =========================================================================
 
-async function checkGameProgress() {
+// Bu oturum boyunca ilerleme durumunu önbellekte tutuyoruz. Amaç:
+// 1) Sonuç gelene kadar quiz ekranının "yanlışlıkla" görünüp sonra
+//    "çözüldü" haline dönüşmesini engellemek (flaş/gecikme sorunu),
+// 2) Bir kere kontrol ettikten sonra (özellikle kullanıcı quiz/puzzle
+//    ile aktif olarak etkileşimdeyken) tekrar sunucuya sorup mevcut
+//    ekranın (örn. az önce açılan warn box / teşekkür kartı) üzerine
+//    yazılmasını tamamen önlemek.
+const gamesProgressState = {
+    checked: false,
+    quizSolved: false,
+    puzzleSolved: false
+};
+
+async function prepareGamesTab() {
+    // Bu oturumda durum zaten biliniyorsa (daha önce kontrol edildiyse
+    // veya kullanıcı az önce quiz/puzzle'ı bu oturumda çözdüyse),
+    // sunucuya tekrar sorup ekranın üzerine yazmıyoruz.
+    if (gamesProgressState.checked) {
+        return;
+    }
+
+    const gamesContainer = document.querySelector(".games-container");
+    if (!gamesContainer) return;
+
+    // Sonuç gelene kadar mevcut içeriği sakla ve yerine kısa bir
+    // yükleniyor göstergesi koy. Böylece quiz ekranı bir an görünüp
+    // hemen ardından "çözüldü" yazısına dönüşmüyor.
+    const originalHTML = gamesContainer.innerHTML;
+    gamesContainer.innerHTML = `
+        <div style="text-align:center; padding: 60px 15px;">
+            <div class="heart-spinner" style="font-size: 30px;">💓</div>
+        </div>
+    `;
+
     try {
         const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getProgress`);
         const result = await response.json();
 
-        if (result.quizSolved) {
+        gamesProgressState.checked = true;
+        gamesProgressState.quizSolved = !!result.quizSolved;
+        gamesProgressState.puzzleSolved = !!result.puzzleSolved;
+
+        if (gamesProgressState.quizSolved) {
             renderQuizAlreadyDone();
-            if (result.puzzleSolved) {
+            if (gamesProgressState.puzzleSolved) {
                 renderPuzzleAlreadyDone();
             }
+        } else {
+            // Henüz çözülmemiş: orijinal quiz giriş ekranını geri getir
+            gamesContainer.innerHTML = originalHTML;
         }
     } catch (err) {
         console.error("İlerleme kontrol hatası:", err);
+        // Hata durumunda kullanıcının quizi normal şekilde oynayabilmesi
+        // için orijinal ekrana geri dönüyoruz.
+        gamesContainer.innerHTML = originalHTML;
     }
 }
 
@@ -1024,6 +1082,12 @@ btn.onclick = (e) => {
                     // 🚨 Soru indeksini kilitliyoruz
                     quizCurrentQuestion = 999; 
 
+                    // 📌 [YENİ]: Önbelleği anında güncelliyoruz ki tab tekrar
+                    // açılırsa/kontrol tetiklenirse mevcut ekranın (puzzle dahil)
+                    // üzerine tekrar yazılmasın.
+                    gamesProgressState.checked = true;
+                    gamesProgressState.quizSolved = true;
+
                     // 📌 [YENİ]: Quiz'i sunucu tarafında (tüm cihazlar için)
                     // kalıcı olarak "çözüldü" işaretliyoruz.
                     fetch(`${GOOGLE_SCRIPT_URL}?action=setQuizSolved`)
@@ -1361,6 +1425,12 @@ function handlePieceClick(index) {
                     "Lina seni gülümsettiyse;<br><br><strong style='color:#ff4d79; font-size:15px;'>Samet'in hediyesi: 5 veyaaa 10 adet gıdından öpmek :)</strong>", 
                     "Tamam", 
                     () => { 
+                        // 📌 [YENİ]: Önbelleği anında güncelliyoruz ki tab tekrar
+                        // açılırsa/kontrol tetiklenirse teşekkür kartının
+                        // üzerine tekrar yazılmasın.
+                        gamesProgressState.checked = true;
+                        gamesProgressState.puzzleSolved = true;
+
                         // 📌 [YENİ]: Puzzle'ı sunucu tarafında (tüm cihazlar için)
                         // kalıcı olarak "çözüldü" işaretliyoruz.
                         fetch(`${GOOGLE_SCRIPT_URL}?action=setPuzzleSolved`)
